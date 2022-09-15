@@ -19,7 +19,7 @@
     <None Include="res\shaders\vs.shader" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\entry.cpp">
+    <ClCompile Include="src\life.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

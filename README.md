@@ -2,11 +2,12 @@
 OpenGL Application.
 
 ## Build Instructions
-Build Solution and set Sandbox as startup project to test a scene.
+Build Solution and set any of the projects other than Eisen as startup project to test it.
 
 ## Third Party Libraries and Dependencies
 - glfw
 - glad
+- stb image loader
 
 ## Resources and Reference Links
 - OpenGL Superbible book

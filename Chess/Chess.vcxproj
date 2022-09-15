@@ -136,7 +136,12 @@
     <None Include="res\shaders\vs.shader" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\entry.cpp" />
+    <ClCompile Include="src\chess.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Eisen\Eisen.vcxproj">
+      <Project>{c87c7ec5-51e5-471a-811e-c0adfa2434c6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

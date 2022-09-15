@@ -136,7 +136,7 @@
     <None Include="res\shaders\vs.shader" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\entry.cpp" />
+    <ClCompile Include="src\life.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Eisen\Eisen.vcxproj">
