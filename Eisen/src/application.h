@@ -8,9 +8,6 @@
 
 namespace Eisen
 {
-
-	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
 	class OpenGLApp
 	{
 	public:
@@ -50,5 +47,3 @@ int main()                       \
 	delete app;                  \
 	return 0;                    \
 }                                \
-
-

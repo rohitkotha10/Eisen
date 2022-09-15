@@ -2,12 +2,6 @@
 
 namespace Eisen
 {
-
-	void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-	{
-		glViewport(0, 0, width, height);
-	};
-
 	void OpenGLApp::run()
 	{
 		init();
@@ -33,7 +27,6 @@ namespace Eisen
 		}
 
 		glfwMakeContextCurrent(window);
-		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
