@@ -1,4 +1,8 @@
 #include "Eisen.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>;
+
 using namespace Eisen;
 
 class my_app : public OpenGLApp
@@ -7,6 +11,8 @@ class my_app : public OpenGLApp
 	GLuint vao;
 	GLuint vertBuffer;
 	GLuint indBuffer;
+	GLuint tex0;
+	GLuint tex1;
 public:
 	void init()
 	{
@@ -74,10 +80,10 @@ public:
 	{
 		static const GLfloat vertices[] =
 		{
-			0.5f, 0.5f,
-			0.5f, -0.5f,
-			-0.5f, -0.5f,
-			-0.5f, 0.5f
+			0.5f, 0.5f, 1.0f, 1.0f,
+			0.5f, -0.5f, 1.0f, 0.0f,
+			-0.5f, -0.5f, 0.0f, 0.0f,
+			-0.5f, 0.5f, 0.0f, 1.0f
 		};
 		static const int indices[] =
 		{
@@ -88,6 +94,9 @@ public:
 		glGenBuffers(1, &vertBuffer);
 		glGenBuffers(1, &indBuffer);
 
+		glGenTextures(1, &tex0);
+		glGenTextures(1, &tex1);
+
 		glBindVertexArray(vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
@@ -96,14 +105,66 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+
+		glBindTexture(GL_TEXTURE_2D, tex0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_set_flip_vertically_on_load(true);
+		int width, height, nrChannels;
+		unsigned char* data = stbi_load("res/media/smile.jpg", &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			std::cout << "Failed to load texture" << std::endl;
+		}
+		stbi_image_free(data);
+
+		glBindTexture(GL_TEXTURE_2D, tex1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_set_flip_vertically_on_load(true);
+		data = stbi_load("res/media/wood.jpg", &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			std::cout << "Failed to load texture" << std::endl;
+		}
+		stbi_image_free(data);
+
 	}
 
 	void render(double currentTime)
 	{
 		glUseProgram(program);
 		glBindVertexArray(vao);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex0);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, tex1);
+
+		setInt(program, "tex0", 0);
+		setInt(program, "tex1", 1);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
