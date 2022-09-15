@@ -1,5 +1,8 @@
 #include "Eisen.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>;
+
 #include <vector>
 
 using namespace std;
@@ -23,6 +26,19 @@ class my_app : public OpenGLApp
 	GLuint vertBuffer;
 	GLuint indBuffer;
 	vector<vector<char>> board;
+	GLuint texKingWhite;
+	GLuint texQueenWhite;
+	GLuint texRookWhite;
+	GLuint texKnightWhite;
+	GLuint texBishopWhite;
+	GLuint texPawnWhite;
+
+	GLuint texKingBlack;
+	GLuint texQueenBlack;
+	GLuint texRookBlack;
+	GLuint texKnightBlack;
+	GLuint texBishopBlack;
+	GLuint texPawnBlack;
 public:
 	void init()
 	{
@@ -93,10 +109,10 @@ public:
 
 		static const GLfloat vertices[] =
 		{
-			1.0f, 1.0f,
-			1.0f, -1.0f,
-			-1.0f, -1.0f,
-			-1.0f, 1.0f
+			1.0f, 1.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 1.0f, 0.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f,
+			-1.0f, 1.0f, 0.0f, 1.0f
 		};
 		static const int indices[] =
 		{
@@ -107,6 +123,20 @@ public:
 		glGenBuffers(1, &vertBuffer);
 		glGenBuffers(1, &indBuffer);
 
+		glGenTextures(1, &texKingWhite);
+		glGenTextures(1, &texQueenWhite);
+		glGenTextures(1, &texRookWhite);
+		glGenTextures(1, &texKnightWhite);
+		glGenTextures(1, &texBishopWhite);
+		glGenTextures(1, &texPawnWhite);
+
+		glGenTextures(1, &texKingBlack);
+		glGenTextures(1, &texQueenBlack);
+		glGenTextures(1, &texRookBlack);
+		glGenTextures(1, &texKnightBlack);
+		glGenTextures(1, &texBishopBlack);
+		glGenTextures(1, &texPawnBlack);
+
 		glBindVertexArray(vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
@@ -115,8 +145,11 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 
 		int n = 8;
 		vector<vector<char>> temp(n, vector<char>(n));
@@ -141,13 +174,37 @@ public:
 			}
 		}
 		board = temp;
+
+		glBindTexture(GL_TEXTURE_2D, texKingWhite);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_set_flip_vertically_on_load(true);
+		int width, height, nrChannels;
+		unsigned char* data = stbi_load("res/media/bking.png", &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			std::cout << "Failed to load texture" << std::endl;
+		}
+		stbi_image_free(data);
 	}
 
 	void render(double currentTime)
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glUseProgram(program);
 		glBindVertexArray(vao);
-		int time = 0;
+
+		setInt(program, "tex", 0);
 		setMat4(program, "trans_matrix", glm::mat4(1.0f));
 		setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -171,11 +228,23 @@ public:
 					curMat = glm::scale(curMat, glm::vec3(scale));
 
 					setMat4(program, "trans_matrix", curMat);
-					setVec3(program, "color", glm::vec3(0.2f, 0.2f, 0.2f));
+					setVec3(program, "color", glm::vec3(0.7f, 0.5f, 0.3f));
 					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 				}
 			}
 		}
+
+		float xshift = -1.0f + (2 * 0 + 1) * incr;
+		float yshift = 1.0f - (2 * 0 + 1) * incr;
+		curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+		curMat = glm::scale(curMat, glm::vec3(scale));
+
+		setInt(program, "tex", 1);
+		setMat4(program, "trans_matrix", curMat);
+		setVec3(program, "color", glm::vec3(0.2f, 0.2f, 0.2f));
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texKingWhite);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
 	void shutdown()
