@@ -13,7 +13,7 @@ void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, i
 		glfwSetWindowShouldClose(window, true);
 };
 
-int xmouse, ymouse;
+double xmouse, ymouse;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	xmouse = xpos;
@@ -26,7 +26,6 @@ class my_app : public OpenGLApp
 	GLuint vao;
 	GLuint vertBuffer;
 	GLuint indBuffer;
-	vector<vector<char>> board;
 	GLuint texBoard;
 	GLuint texKingWhite;
 	GLuint texQueenWhite;
@@ -158,30 +157,6 @@ public:
 
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
-
-		int n = 10;
-		vector<vector<char>> temp(n, vector<char>(n, 'n'));
-		for (int i = 1; i < 9; i++)
-		{
-			for (int j = 1; j < 9; j++)
-			{
-				if (i % 2 == 0)
-				{
-					if (j % 2 == 0)
-						temp[i][j] = '0';
-					else
-						temp[i][j] = '1';
-				}
-				else
-				{
-					if (j % 2 == 0)
-						temp[i][j] = '1';
-					else
-						temp[i][j] = '0';
-				}
-			}
-		}
-		board = temp;
 
 		load_tex(texBoard, "res/media/board.jpg", false);
 

@@ -1,7 +1,7 @@
 #include "Eisen.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>;
+#include <stb_image.h>
 
 using namespace Eisen;
 
@@ -16,7 +16,7 @@ void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, i
 		glfwSetWindowShouldClose(window, true);
 };
 
-int xmouse, ymouse;
+double xmouse, ymouse;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	xmouse = xpos;

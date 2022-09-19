@@ -211,8 +211,8 @@ public:
 
 		glm::mat4 curMat = glm::mat4(1.0f);
 
-		int n = curConway.size();
-		int m = curConway[0].size();
+		int n = (int)curConway.size();
+		int m = (int)curConway[0].size();
 
 		float scale = 1.0f / max(n, m);
 		float incr = scale;
