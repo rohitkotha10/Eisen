@@ -2,6 +2,9 @@
 #include "Eisen.h"
 
 #include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>;
@@ -9,7 +12,7 @@
 using namespace std;
 using namespace Eisen;
 
-void load_tex(GLuint tex, string path, bool needAlpha)
+void load_tex(GLuint& tex, string path, bool needAlpha)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -35,7 +38,23 @@ void load_tex(GLuint tex, string path, bool needAlpha)
 	stbi_image_free(data);
 }
 
-void place(GLuint program, GLuint piece, string place)
+string getPos(int xpos, int ypos) //for mouse picking
+{
+	return "A8";
+}
+
+void getMove(map<string, string>& table, string move)
+{
+	if (move == "s")
+		return;
+	transform(move.begin(), move.end(), move.begin(), ::toupper);
+	string fir = move.substr(0, 2);
+	string sec = move.substr(2, 2);
+	table[sec] = table[fir];
+	table[fir] = "empty";
+}
+
+void place(GLuint& program, GLuint& piece, string place)
 {
 	int i = place[0] - 64;
 	int j = place[1] - '0';
@@ -51,7 +70,7 @@ void place(GLuint program, GLuint piece, string place)
 	curMat = glm::scale(curMat, glm::vec3(scale));
 
 	setMat4(program, "trans_matrix", curMat);
-	setVec3(program, "color", glm::vec3(0.2f, 0.2f, 0.2f));
+	setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, piece);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

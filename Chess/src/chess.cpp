@@ -1,10 +1,6 @@
-#include "Eisen.h"
 #include "pieces.h"
 
-#include <vector>
-
-using namespace std;
-using namespace Eisen;
+int start = 0;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -16,6 +12,13 @@ void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, i
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 };
+
+int xmouse, ymouse;
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	xmouse = xpos;
+	ymouse = ypos;
+}
 
 class my_app : public OpenGLApp
 {
@@ -38,6 +41,8 @@ class my_app : public OpenGLApp
 	GLuint texKnightBlack;
 	GLuint texBishopBlack;
 	GLuint texPawnBlack;
+
+	map<string, string> chessTable;
 public:
 	void init()
 	{
@@ -105,6 +110,8 @@ public:
 	{
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
+		glfwSetCursorPosCallback(window, mouse_callback);
+
 
 		static const GLfloat vertices[] =
 		{
@@ -191,10 +198,72 @@ public:
 		load_tex(texKnightBlack, "res/media/bknight.png", true);
 		load_tex(texBishopBlack, "res/media/bbishop.png", true);
 		load_tex(texPawnBlack, "res/media/bpawn.png", true);
+
+		chessTable["A1"] = "wr";
+		chessTable["B1"] = "wn";
+		chessTable["C1"] = "wb";
+		chessTable["D1"] = "wq";
+		chessTable["E1"] = "wk";
+		chessTable["F1"] = "wb";
+		chessTable["G1"] = "wn";
+		chessTable["H1"] = "wr";
+
+		chessTable["A2"] = "wp";
+		chessTable["B2"] = "wp";
+		chessTable["C2"] = "wp";
+		chessTable["D2"] = "wp";
+		chessTable["E2"] = "wp";
+		chessTable["F2"] = "wp";
+		chessTable["G2"] = "wp";
+		chessTable["H2"] = "wp";
+
+		chessTable["A8"] = "br";
+		chessTable["B8"] = "bn";
+		chessTable["C8"] = "bb";
+		chessTable["D8"] = "bq";
+		chessTable["E8"] = "bk";
+		chessTable["F8"] = "bb";
+		chessTable["G8"] = "bn";
+		chessTable["H8"] = "br";
+
+		chessTable["A7"] = "bp";
+		chessTable["B7"] = "bp";
+		chessTable["C7"] = "bp";
+		chessTable["D7"] = "bp";
+		chessTable["E7"] = "bp";
+		chessTable["F7"] = "bp";
+		chessTable["G7"] = "bp";
+		chessTable["H7"] = "bp";
 	}
 
 	void render(double currentTime)
 	{
+		if (start == 1)
+		{
+			cout << "White Turn: ";
+			string query;
+			cin >> query;
+			getMove(chessTable, query);
+			start = 2;
+		}
+
+		else if (start == 2)
+		{
+			cout << "Black Turn: ";
+			string query;
+			cin >> query;
+			cout << endl;
+			getMove(chessTable, query);
+			start = 1;
+		}
+
+		if (start == 0)
+		{
+			cout << "Welcome to CHESS!!!\n" <<
+				"Enter your moves in the Long Algebraic Notation i.e. <startplace><endplace>\n" <<
+				"Example: a1a2, will move piece from A1 to A2\n\n\n" << endl;
+			start = 1;
+		}
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -202,48 +271,41 @@ public:
 		glBindVertexArray(vao);
 
 		setMat4(program, "trans_matrix", glm::mat4(1.0f));
-		setVec3(program, "color", glm::vec3(0.7f, 0.6f, 0.5f));
+		setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texBoard);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		place(program, texRookWhite, "A1");
-		place(program, texKnightWhite, "B1");
-		place(program, texBishopWhite, "C1");
-		place(program, texQueenWhite, "D1");
-		place(program, texKingWhite, "E1");
-		place(program, texBishopWhite, "F1");
-		place(program, texKnightWhite, "G1");
-		place(program, texRookWhite, "H1");
+		for (auto cur : chessTable)
+		{
+			if (cur.second == "empty")
+				continue;
+			if (cur.second == "wp")
+				place(program, texPawnWhite, cur.first);
+			else if (cur.second == "wr")
+				place(program, texRookWhite, cur.first);
+			else if (cur.second == "wn")
+				place(program, texKnightWhite, cur.first);
+			else if (cur.second == "wb")
+				place(program, texBishopWhite, cur.first);
+			else if (cur.second == "wq")
+				place(program, texQueenWhite, cur.first);
+			else if (cur.second == "wk")
+				place(program, texKingWhite, cur.first);
 
-		place(program, texPawnWhite, "A2");
-		place(program, texPawnWhite, "B2");
-		place(program, texPawnWhite, "C2");
-		place(program, texPawnWhite, "D2");
-		place(program, texPawnWhite, "E2");
-		place(program, texPawnWhite, "F2");
-		place(program, texPawnWhite, "G2");
-		place(program, texPawnWhite, "H2");
-
-		place(program, texRookBlack, "A8");
-		place(program, texKnightBlack, "B8");
-		place(program, texBishopBlack, "C8");
-		place(program, texQueenBlack, "D8");
-		place(program, texKingBlack, "E8");
-		place(program, texBishopBlack, "F8");
-		place(program, texKnightBlack, "G8");
-		place(program, texRookBlack, "H8");
-
-		place(program, texPawnBlack, "A7");
-		place(program, texPawnBlack, "B7");
-		place(program, texPawnBlack, "C7");
-		place(program, texPawnBlack, "D7");
-		place(program, texPawnBlack, "E7");
-		place(program, texPawnBlack, "F7");
-		place(program, texPawnBlack, "G7");
-		place(program, texPawnBlack, "H7");
-
-
+			else if (cur.second == "bp")
+				place(program, texPawnBlack, cur.first);
+			else if (cur.second == "br")
+				place(program, texRookBlack, cur.first);
+			else if (cur.second == "bn")
+				place(program, texKnightBlack, cur.first);
+			else if (cur.second == "bb")
+				place(program, texBishopBlack, cur.first);
+			else if (cur.second == "bq")
+				place(program, texQueenBlack, cur.first);
+			else if (cur.second == "bk")
+				place(program, texKingBlack, cur.first);
+		}
 
 	}
 

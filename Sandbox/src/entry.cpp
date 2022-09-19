@@ -16,6 +16,13 @@ void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, i
 		glfwSetWindowShouldClose(window, true);
 };
 
+int xmouse, ymouse;
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	xmouse = xpos;
+	ymouse = ypos;
+}
+
 class my_app : public OpenGLApp
 {
 	GLuint program;
@@ -91,6 +98,7 @@ public:
 	{
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
+		glfwSetCursorPosCallback(window, mouse_callback);
 
 		static const GLfloat vertices[] =
 		{
@@ -168,6 +176,7 @@ public:
 
 	void render(double currentTime)
 	{
+		std::cout << xmouse << ' ' << ymouse << ' ' << std::endl;
 		glUseProgram(program);
 		glBindVertexArray(vao);
 
