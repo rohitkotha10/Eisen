@@ -1,5 +1,10 @@
 #include "pieces.h"
 
+#include <windows.h>
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}//force GPU use
+
 int start = 0;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -49,7 +54,7 @@ public:
 		info.height = 800;
 		info.MajorVersion = 4;
 		info.MinorVersion = 5;
-		info.title = "Triangle";
+		info.title = "Chess";
 		info.color = new float[4] {0.0f, 0.6f, 0.0f, 1.0f};
 		info.fullscreen = false;
 	}
@@ -107,6 +112,10 @@ public:
 
 	void startup()
 	{
+		std::cout << glGetString(GL_VENDOR) << std::endl;
+		std::cout << glGetString(GL_VERSION) << std::endl;
+		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
+
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);

@@ -3,6 +3,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <windows.h>
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}//force GPU use
+
 using namespace Eisen;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -34,11 +39,11 @@ class my_app : public OpenGLApp
 public:
 	void init()
 	{
-		info.width = 1280;
-		info.height = 720;
+		info.width = 800;
+		info.height = 800;
 		info.MajorVersion = 4;
-		info.MinorVersion = 5;
-		info.title = "Triangle";
+		info.MinorVersion = 6;
+		info.title = "Sandbox";
 		info.color = new float[4] {0.1f, 0.1f, 0.1f, 0.1f};
 		info.fullscreen = false;
 	}
@@ -96,6 +101,10 @@ public:
 
 	void startup()
 	{
+		std::cout << glGetString(GL_VENDOR) << std::endl;
+		std::cout << glGetString(GL_VERSION) << std::endl;
+		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
+
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
@@ -176,7 +185,6 @@ public:
 
 	void render(double currentTime)
 	{
-		std::cout << xmouse << ' ' << ymouse << ' ' << std::endl;
 		glUseProgram(program);
 		glBindVertexArray(vao);
 
