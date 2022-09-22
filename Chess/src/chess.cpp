@@ -6,6 +6,15 @@ extern "C" {
 }//force GPU use
 
 int start = 0;
+int xmouse, ymouse;
+int press = 0;
+int selected = 0;
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		press = 1 - press;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -18,11 +27,15 @@ void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, i
 		glfwSetWindowShouldClose(window, true);
 };
 
-double xmouse, ymouse;
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	xmouse = xpos;
-	ymouse = ypos;
+	xmouse = (int)xpos;
+	ymouse = (int)ypos;
+}
+
+void onClick()
+{
+
 }
 
 class my_app : public OpenGLApp
@@ -47,6 +60,7 @@ class my_app : public OpenGLApp
 	GLuint texPawnBlack;
 
 	map<string, string> chessTable;
+	string curSel;
 public:
 	void init()
 	{
@@ -119,6 +133,7 @@ public:
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
+		glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 
 		static const GLfloat vertices[] =
@@ -218,11 +233,12 @@ public:
 		chessTable["F7"] = "bp";
 		chessTable["G7"] = "bp";
 		chessTable["H7"] = "bp";
+		press = 0;
 	}
 
 	void render(double currentTime)
 	{
-		if (start == 1)
+		/*if (start == 1)
 		{
 			cout << "White Turn: ";
 			string query;
@@ -247,7 +263,7 @@ public:
 				"Enter your moves in the Long Algebraic Notation i.e. <startplace><endplace>\n" <<
 				"Example: a1a2, will move piece from A1 to A2\n\n\n" << endl;
 			start = 1;
-		}
+		}*/
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -289,6 +305,23 @@ public:
 				place(program, texQueenBlack, cur.first);
 			else if (cur.second == "bk")
 				place(program, texKingBlack, cur.first);
+		}
+
+		if (press == 1)
+		{
+			if (selected == 0)
+			{
+				curSel = getPos(xmouse, ymouse);
+				press = 0;
+				selected = 1;
+			}
+			else if (selected == 1)
+			{
+				string query = curSel + getPos(xmouse, ymouse);
+				press = 0;
+				selected = 0;
+				getMove(chessTable, query);
+			}
 		}
 
 	}

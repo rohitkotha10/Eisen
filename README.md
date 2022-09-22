@@ -8,6 +8,7 @@ Build Solution and set any of the projects other than Eisen as startup project t
 - glfw
 - glad
 - stb image loader
+- glm math
 
 ## Resources and Reference Links
 - OpenGL Superbible book

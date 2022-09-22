@@ -40,7 +40,16 @@ void load_tex(GLuint& tex, string path, bool needAlpha)
 
 string getPos(int xpos, int ypos) //for mouse picking
 {
-	return "A8";
+	int file = 64; //0 in alphabet
+	int rank = 0;
+	file += xpos / 80;
+	rank += ypos / 80;
+	rank = 8 - rank;
+	rank += (int)'1';
+	string s;
+	s.push_back((char)file);
+	s.push_back((char)rank);
+	return s;
 }
 
 void getMove(map<string, string>& table, string move)
