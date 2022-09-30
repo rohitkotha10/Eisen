@@ -12,6 +12,27 @@
 using namespace std;
 using namespace Eisen;
 
+void paintBox(GLuint& program, string place)
+{
+	int i = place[0] - 64;
+	int j = place[1] - '0';
+	glm::mat4 curMat = glm::mat4(1.0f);
+	int n = 10;
+
+	float scale = 1.0f / n;
+	float incr = scale;
+
+	float xshift = -1.0f + (2 * i + 1) * incr;
+	float yshift = -1.0f + (2 * j + 1) * incr;
+	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+	curMat = glm::scale(curMat, glm::vec3(scale));
+
+	setInt(program, "choice", 0);
+	setMat4(program, "trans_matrix", curMat);
+	setVec3(program, "color", glm::vec3(0.8f, 1.0f, 0.0f));
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 void load_tex(GLuint& tex, string path, bool needAlpha)
 {
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -78,6 +99,7 @@ void place(GLuint& program, GLuint& piece, string place)
 	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
 	curMat = glm::scale(curMat, glm::vec3(scale));
 
+	setInt(program, "choice", 1);
 	setMat4(program, "trans_matrix", curMat);
 	setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 	glActiveTexture(GL_TEXTURE0);

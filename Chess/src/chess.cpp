@@ -10,6 +10,8 @@ int xmouse, ymouse;
 int press = 0;
 int selected = 0;
 
+void(*framebuffer_func)(GLFWwindow*, int, int);
+
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -69,7 +71,7 @@ public:
 		info.MajorVersion = 4;
 		info.MinorVersion = 5;
 		info.title = "Chess";
-		info.color = new float[4] {0.0f, 0.6f, 0.0f, 1.0f};
+		info.color = new float[4] {0.2f, 0.2f, 0.2f, 1.0f};
 		info.fullscreen = false;
 	}
 
@@ -123,14 +125,18 @@ public:
 		glDeleteShader(vs);
 		glDeleteShader(fs);
 	}
-
+	static void call_in(GLFWwindow* window, int width, int height)
+	{
+		glViewport(400, 0, width, height);
+	}
 	void startup()
 	{
 		std::cout << glGetString(GL_VENDOR) << std::endl;
 		std::cout << glGetString(GL_VERSION) << std::endl;
 		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
 
-		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+		//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+		glfwSetFramebufferSizeCallback(window, call_in);
 		glfwSetKeyCallback(window, keyboard_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -270,11 +276,19 @@ public:
 		glUseProgram(program);
 		glBindVertexArray(vao);
 
+		setInt(program, "choice", 1);
 		setMat4(program, "trans_matrix", glm::mat4(1.0f));
 		setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texBoard);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		paintBox(program, "H2");
+		paintBox(program, "H3");
+		paintBox(program, "H4");
+		paintBox(program, "H5");
+		paintBox(program, "H2");
+		paintBox(program, "H2");
 
 		for (auto cur : chessTable)
 		{

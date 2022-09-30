@@ -6,8 +6,13 @@ in vec2 texPos;
 
 uniform sampler2D tex0;
 uniform vec3 color;
+uniform int choice;
 
 void main()
 {
-	FragColor = texture(tex0, texPos) * vec4(color, 1.0);
+	if (choice == 1)
+		FragColor = texture(tex0, texPos);
+	else
+		FragColor = vec4(color, 0.5);
+
 };
