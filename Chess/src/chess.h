@@ -12,10 +12,24 @@
 using namespace std;
 using namespace Eisen;
 
+string getPos(int xpos, int ypos) //for mouse picking
+{
+	int file = 'a' - 1; //0 in alphabet
+	int rank = 0;
+	file += xpos / 80;
+	rank += ypos / 80;
+	rank = 8 - rank;
+	rank += (int)'1';
+	string s;
+	s.push_back((char)file);
+	s.push_back((char)rank);
+	return s;
+}
+
 void paintBox(GLuint& program, string place, int occupy)
 {
-	int i = place[0] - 64;
-	int j = place[1] - '0';
+	int i = place[0] - ('a' - 1);
+	int j = place[1] - ('1' - 1);
 	glm::mat4 curMat = glm::mat4(1.0f);
 	int n = 10;
 
@@ -35,8 +49,8 @@ void paintBox(GLuint& program, string place, int occupy)
 
 void paintPiece(GLuint& program, string place)
 {
-	int i = place[0] - 64;
-	int j = place[1] - '0';
+	int i = place[0] - ('a' - 1);
+	int j = place[1] - ('1' - 1);
 	glm::mat4 curMat = glm::mat4(1.0f);
 	int n = 10;
 
@@ -49,10 +63,50 @@ void paintPiece(GLuint& program, string place)
 	curMat = glm::scale(curMat, glm::vec3(scale));
 
 	setInt(program, "choice", 0);
-	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 0.0f, 0.5f));
+	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 0.0f, 0.6f));
 	setMat4(program, "trans_matrix", curMat);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
+void getPreview(GLuint& program, map<string, string>& chessTable, string place)
+{
+	paintPiece(program, place);
+}
+
+int processMove(map<string, string>& table, string move)
+{
+	string fir = move.substr(0, 2);
+	string sec = move.substr(2, 2);
+	if (table[fir] == "empty" || table[fir] == "" || table[fir] == table[sec]) //check valid here
+		return -1;
+	table[sec] = table[fir];
+	table[fir] = "empty";
+	return 0;
+}
+
+void place(GLuint& program, GLuint& piece, string place)
+{
+	int i = place[0] - ('a' - 1);
+	int j = place[1] - ('1' - 1);
+	glm::mat4 curMat = glm::mat4(1.0f);
+	int n = 10;
+
+	float scale = 1.0f / n;
+	float incr = scale;
+
+	float xshift = -1.0f + (2 * i + 1) * incr;
+	float yshift = -1.0f + (2 * j + 1) * incr;
+	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+	curMat = glm::scale(curMat, glm::vec3(scale));
+
+	setInt(program, "choice", 1);
+	setMat4(program, "trans_matrix", curMat);
+	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, piece);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 
 void load_tex(GLuint& tex, string path, bool needAlpha)
 {
@@ -78,52 +132,4 @@ void load_tex(GLuint& tex, string path, bool needAlpha)
 		std::cout << "Failed to load texture: " << path << std::endl;
 	}
 	stbi_image_free(data);
-}
-
-string getPos(int xpos, int ypos) //for mouse picking
-{
-	int file = 64; //0 in alphabet
-	int rank = 0;
-	file += xpos / 80;
-	rank += ypos / 80;
-	rank = 8 - rank;
-	rank += (int)'1';
-	string s;
-	s.push_back((char)file);
-	s.push_back((char)rank);
-	return s;
-}
-
-void getMove(map<string, string>& table, string move)
-{
-	if (move == "s")
-		return;
-	transform(move.begin(), move.end(), move.begin(), ::toupper);
-	string fir = move.substr(0, 2);
-	string sec = move.substr(2, 2);
-	table[sec] = table[fir];
-	table[fir] = "empty";
-}
-
-void place(GLuint& program, GLuint& piece, string place)
-{
-	int i = place[0] - 64;
-	int j = place[1] - '0';
-	glm::mat4 curMat = glm::mat4(1.0f);
-	int n = 10;
-
-	float scale = 1.0f / n;
-	float incr = scale;
-
-	float xshift = -1.0f + (2 * i + 1) * incr;
-	float yshift = -1.0f + (2 * j + 1) * incr;
-	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-	curMat = glm::scale(curMat, glm::vec3(scale));
-
-	setInt(program, "choice", 1);
-	setMat4(program, "trans_matrix", curMat);
-	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, piece);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

@@ -2,7 +2,18 @@
 OpenGL Application.
 
 ## Build Instructions
-Build Solution and set any of the projects other than Eisen as startup project to test it.
+- You will need `Visual Studio 2022` with `C++` Desktop Environment to Build this Solution.
+- Build the solution and then select one of the projects as a startup project to test it.
+
+## Examples and Projects
+- Chess
+- Life
+
+## Ideas and Tasks
+- 3D
+- Batch renderer
+- Sound for games
+- UI implementation
 
 ## Third Party Libraries and Dependencies
 - glfw
@@ -12,5 +23,5 @@ Build Solution and set any of the projects other than Eisen as startup project t
 
 ## Resources and Reference Links
 - OpenGL Superbible book
-- Learn OpenGL website: https://learnopengl.com/Introduction
-- The Cherno Youtube channel and github: https://github.com/TheCherno
+- Learn OpenGL website: `https://learnopengl.com`
+- The Cherno Youtube channel and github: `https://github.com/TheCherno`

@@ -5,15 +5,13 @@
 //	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 //}//force GPU use
 
-int start = 0;
 int xmouse, ymouse;
 int press = 0;
-int selected = 0;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-		press = 1 - press;
+		press = 1;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -54,7 +52,12 @@ class my_app : public OpenGLApp
 	GLuint texPawnBlack;
 
 	map<string, string> chessTable;
-	string curSel;
+	int status;
+	int preview; //is move display on or off
+	string curPreview; //current preview position
+	int turn; //0 for black, 1 for white
+	int counter;
+
 public:
 	void init()
 	{
@@ -118,15 +121,15 @@ public:
 		glDeleteShader(vs);
 		glDeleteShader(fs);
 	}
-	static void call_in(GLFWwindow* window, int width, int height)
-	{
-		glViewport(400, 0, width, height);
-	}
+
 	void startup()
 	{
 		std::cout << glGetString(GL_VENDOR) << std::endl;
 		std::cout << glGetString(GL_VERSION) << std::endl;
 		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
+
+		cout << "Welcome to CHESS!!!\n";
+		cout << "White to Start\n1: ";
 
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
@@ -146,7 +149,9 @@ public:
 			0, 1, 3,
 			1, 2, 3
 		};
+
 		glGenVertexArrays(1, &vao);
+
 		glGenBuffers(1, &vertBuffer);
 		glGenBuffers(1, &indBuffer);
 
@@ -192,76 +197,50 @@ public:
 		load_tex(texBishopBlack, "res/media/bbishop.png", true);
 		load_tex(texPawnBlack, "res/media/bpawn.png", true);
 
-		/*chessTable["A1"] = "wr";
-		chessTable["B1"] = "wn";
-		chessTable["C1"] = "wb";
-		chessTable["D1"] = "wq";
-		chessTable["E1"] = "wk";
-		chessTable["F1"] = "wb";
-		chessTable["G1"] = "wn";
-		chessTable["H1"] = "wr";
+		chessTable["a1"] = "wr";
+		chessTable["b1"] = "wn";
+		chessTable["c1"] = "wb";
+		chessTable["d1"] = "wq";
+		chessTable["e1"] = "wk";
+		chessTable["f1"] = "wb";
+		chessTable["g1"] = "wn";
+		chessTable["h1"] = "wr";
 
-		chessTable["A2"] = "wp";
-		chessTable["B2"] = "wp";
-		chessTable["C2"] = "wp";
-		chessTable["D2"] = "wp";
-		chessTable["E2"] = "wp";
-		chessTable["F2"] = "wp";
-		chessTable["G2"] = "wp";
-		chessTable["H2"] = "wp";
+		chessTable["a2"] = "wp";
+		chessTable["b2"] = "wp";
+		chessTable["c2"] = "wp";
+		chessTable["d2"] = "wp";
+		chessTable["e2"] = "wp";
+		chessTable["f2"] = "wp";
+		chessTable["g2"] = "wp";
+		chessTable["h2"] = "wp";
 
-		chessTable["A8"] = "br";
-		chessTable["B8"] = "bn";
-		chessTable["C8"] = "bb";
-		chessTable["D8"] = "bq";
-		chessTable["E8"] = "bk";
-		chessTable["F8"] = "bb";
-		chessTable["G8"] = "bn";
-		chessTable["H8"] = "br";
+		chessTable["a8"] = "br";
+		chessTable["b8"] = "bn";
+		chessTable["c8"] = "bb";
+		chessTable["d8"] = "bq";
+		chessTable["e8"] = "bk";
+		chessTable["f8"] = "bb";
+		chessTable["g8"] = "bn";
+		chessTable["h8"] = "br";
 
-		chessTable["A7"] = "bp";
-		chessTable["B7"] = "bp";
-		chessTable["C7"] = "bp";
-		chessTable["D7"] = "bp";
-		chessTable["E7"] = "bp";
-		chessTable["F7"] = "bp";
-		chessTable["G7"] = "bp";
-		chessTable["H7"] = "bp";*/
+		chessTable["a7"] = "bp";
+		chessTable["b7"] = "bp";
+		chessTable["c7"] = "bp";
+		chessTable["d7"] = "bp";
+		chessTable["e7"] = "bp";
+		chessTable["f7"] = "bp";
+		chessTable["g7"] = "bp";
+		chessTable["h7"] = "bp";
 
-		chessTable["E4"] = "wn";
-		chessTable["G3"] = "wp";
-		chessTable["C5"] = "bq";
-		press = 0;
+		status = 0;
+		preview = 0;
+		turn = 1;
+		counter = 1;
 	}
 
 	void render(double currentTime)
 	{
-		/*if (start == 1)
-		{
-			cout << "White Turn: ";
-			string query;
-			cin >> query;
-			getMove(chessTable, query);
-			start = 2;
-		}
-
-		else if (start == 2)
-		{
-			cout << "Black Turn: ";
-			string query;
-			cin >> query;
-			cout << endl;
-			getMove(chessTable, query);
-			start = 1;
-		}
-
-		if (start == 0)
-		{
-			cout << "Welcome to CHESS!!!\n" <<
-				"Enter your moves in the Long Algebraic Notation i.e. <startplace><endplace>\n" <<
-				"Example: a1a2, will move piece from A1 to A2\n\n\n" << endl;
-			start = 1;
-		}*/
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -298,18 +277,12 @@ public:
 			}
 		}
 
+		if (preview == 1)
+		{
+			getPreview(program, chessTable, curPreview);
+		}
 
-		paintPiece(program, "E4");
-		paintBox(program, "G5", 0);
-		paintBox(program, "G3", 1);
-		paintBox(program, "C5", 2);
-		paintBox(program, "C3", 0);
-		paintBox(program, "F6", 0);
-		paintBox(program, "F2", 0);
-		paintBox(program, "D6", 0);
-		paintBox(program, "D2", 0);
-
-		for (auto cur : chessTable)
+		for (pair<string, string> cur : chessTable)
 		{
 			if (cur.second == "empty")
 				continue;
@@ -340,23 +313,46 @@ public:
 				place(program, texKingBlack, cur.first);
 		}
 
+		onClick();
+	}
+
+	void onClick()
+	{
 		if (press == 1)
 		{
-			if (selected == 0)
+			string curSel = getPos(xmouse, ymouse);
+			string curPiece = chessTable[curSel];
+			if ((curPiece[0] == 'w' && turn == 1) || (curPiece[0] == 'b' && turn == 0))
 			{
-				curSel = getPos(xmouse, ymouse);
-				press = 0;
-				selected = 1;
+				preview = 1;
+				curPreview = curSel;
 			}
-			else if (selected == 1)
-			{
-				string query = curSel + getPos(xmouse, ymouse);
-				press = 0;
-				selected = 0;
-				getMove(chessTable, query);
-			}
-		}
 
+			else
+			{
+				if (preview == 1)
+				{
+					//check if move is valid and proceed or else put preview to 0;
+					string query = curPreview + curSel;
+
+					if (processMove(chessTable, query) == 0)
+					{
+						cout << query << ' ';
+						if (turn == 0)
+						{
+							counter++;
+							cout << endl;
+							cout << counter << ": ";
+						}
+						turn = 1 - turn;
+					}
+
+				}
+				preview = 0;
+			}
+
+			press = 0;
+		}
 	}
 
 	void shutdown()
