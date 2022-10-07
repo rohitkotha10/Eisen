@@ -32,18 +32,10 @@ namespace Eisen
 			int MinorVersion = 5;
 			float* color = new float[4] { 0.15f, 0.15f, 0.15f, 0.15f };
 			bool fullscreen = 0;
+			bool resize = 1;
 		};
 
 		AppInfo info;
 		GLFWwindow* window = NULL;
 	};
 };
-
-#define START_APP(my_app)        \
-int main()                       \
-{                                \
-	my_app* app = new my_app;    \
-	app->run();                  \
-	delete app;                  \
-	return 0;                    \
-}                                \

@@ -6,9 +6,11 @@ layout(location = 1) in vec2 texIn;
 uniform mat4 trans_matrix;
 
 out vec2 texPos;
+out vec2 pixelPos;
 
 void main()
 {
-	gl_Position = trans_matrix *  vec4(aPos.x, aPos.y, 0.0, 1.0);
+	gl_Position = trans_matrix * vec4(aPos.x, aPos.y, 0.0, 1.0);
 	texPos = texIn;
+	pixelPos = aPos;
 };

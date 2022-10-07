@@ -12,7 +12,28 @@
 using namespace std;
 using namespace Eisen;
 
-void paintBox(GLuint& program, string place)
+void paintBox(GLuint& program, string place, int occupy)
+{
+	int i = place[0] - 64;
+	int j = place[1] - '0';
+	glm::mat4 curMat = glm::mat4(1.0f);
+	int n = 10;
+
+	float scale = 1.0f / n;
+	float incr = scale;
+
+	float xshift = -1.0f + (2 * i + 1) * incr;
+	float yshift = -1.0f + (2 * j + 1) * incr;
+	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+	curMat = glm::scale(curMat, glm::vec3(scale));
+
+	setInt(program, "choice", 2);
+	setMat4(program, "trans_matrix", curMat);
+	setInt(program, "occupy", occupy);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void paintPiece(GLuint& program, string place)
 {
 	int i = place[0] - 64;
 	int j = place[1] - '0';
@@ -28,8 +49,8 @@ void paintBox(GLuint& program, string place)
 	curMat = glm::scale(curMat, glm::vec3(scale));
 
 	setInt(program, "choice", 0);
+	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 0.0f, 0.5f));
 	setMat4(program, "trans_matrix", curMat);
-	setVec3(program, "color", glm::vec3(0.8f, 1.0f, 0.0f));
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -54,7 +75,7 @@ void load_tex(GLuint& tex, string path, bool needAlpha)
 	}
 	else
 	{
-		std::cout << "Failed to load texture" << std::endl;
+		std::cout << "Failed to load texture: " << path << std::endl;
 	}
 	stbi_image_free(data);
 }
@@ -101,7 +122,7 @@ void place(GLuint& program, GLuint& piece, string place)
 
 	setInt(program, "choice", 1);
 	setMat4(program, "trans_matrix", curMat);
-	setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
+	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, piece);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

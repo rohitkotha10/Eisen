@@ -1,16 +1,14 @@
-#include "pieces.h"
+#include "chess.h"
 
 #include <windows.h>
-extern "C" {
-	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-}//force GPU use
+//extern "C" {
+//	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+//}//force GPU use
 
 int start = 0;
 int xmouse, ymouse;
 int press = 0;
 int selected = 0;
-
-void(*framebuffer_func)(GLFWwindow*, int, int);
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -20,7 +18,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-	//glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);
 };
 
 void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -35,18 +33,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	ymouse = (int)ypos;
 }
 
-void onClick()
-{
-
-}
-
 class my_app : public OpenGLApp
 {
 	GLuint program;
 	GLuint vao;
 	GLuint vertBuffer;
 	GLuint indBuffer;
-	GLuint texBoard;
 	GLuint texKingWhite;
 	GLuint texQueenWhite;
 	GLuint texRookWhite;
@@ -73,6 +65,7 @@ public:
 		info.title = "Chess";
 		info.color = new float[4] {0.2f, 0.2f, 0.2f, 1.0f};
 		info.fullscreen = false;
+		info.resize = 0;
 	}
 
 	void shaderCompile()
@@ -135,8 +128,7 @@ public:
 		std::cout << glGetString(GL_VERSION) << std::endl;
 		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
 
-		//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-		glfwSetFramebufferSizeCallback(window, call_in);
+		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -157,8 +149,6 @@ public:
 		glGenVertexArrays(1, &vao);
 		glGenBuffers(1, &vertBuffer);
 		glGenBuffers(1, &indBuffer);
-
-		glGenTextures(1, &texBoard);
 
 		glGenTextures(1, &texKingWhite);
 		glGenTextures(1, &texQueenWhite);
@@ -188,8 +178,6 @@ public:
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
-		load_tex(texBoard, "res/media/board.jpg", false);
-
 		load_tex(texKingWhite, "res/media/wking.png", true);
 		load_tex(texQueenWhite, "res/media/wqueen.png", true);
 		load_tex(texRookWhite, "res/media/wrook.png", true);
@@ -204,7 +192,7 @@ public:
 		load_tex(texBishopBlack, "res/media/bbishop.png", true);
 		load_tex(texPawnBlack, "res/media/bpawn.png", true);
 
-		chessTable["A1"] = "wr";
+		/*chessTable["A1"] = "wr";
 		chessTable["B1"] = "wn";
 		chessTable["C1"] = "wb";
 		chessTable["D1"] = "wq";
@@ -238,7 +226,11 @@ public:
 		chessTable["E7"] = "bp";
 		chessTable["F7"] = "bp";
 		chessTable["G7"] = "bp";
-		chessTable["H7"] = "bp";
+		chessTable["H7"] = "bp";*/
+
+		chessTable["E4"] = "wn";
+		chessTable["G3"] = "wp";
+		chessTable["C5"] = "bq";
 		press = 0;
 	}
 
@@ -276,19 +268,46 @@ public:
 		glUseProgram(program);
 		glBindVertexArray(vao);
 
-		setInt(program, "choice", 1);
+		setInt(program, "choice", 0);
 		setMat4(program, "trans_matrix", glm::mat4(1.0f));
-		setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texBoard);
+		setVec4(program, "color", glm::vec4(0.9f, 0.8f, 0.5f, 1.0f));
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		paintBox(program, "H2");
-		paintBox(program, "H3");
-		paintBox(program, "H4");
-		paintBox(program, "H5");
-		paintBox(program, "H2");
-		paintBox(program, "H2");
+		glm::mat4 curMat = glm::mat4(1.0f);
+		int n = 10;
+
+		float scale = 1.0f / n;
+		float incr = scale;
+		for (int i = 1; i <= 8; i++)
+		{
+			for (int j = 1; j <= 8; j++)
+			{
+				if ((i + j) % 2 == 0)
+					setVec4(program, "color", glm::vec4(0.5f, 0.6f, 0.3f, 1.0f));
+				else
+					setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+				float xshift = -1.0f + (2 * i + 1) * incr;
+				float yshift = -1.0f + (2 * j + 1) * incr;
+				curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+				curMat = glm::scale(curMat, glm::vec3(scale));
+
+				setInt(program, "choice", 0);
+				setMat4(program, "trans_matrix", curMat);
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			}
+		}
+
+
+		paintPiece(program, "E4");
+		paintBox(program, "G5", 0);
+		paintBox(program, "G3", 1);
+		paintBox(program, "C5", 2);
+		paintBox(program, "C3", 0);
+		paintBox(program, "F6", 0);
+		paintBox(program, "F2", 0);
+		paintBox(program, "D6", 0);
+		paintBox(program, "D2", 0);
 
 		for (auto cur : chessTable)
 		{
@@ -346,7 +365,27 @@ public:
 		glDeleteBuffers(1, &vertBuffer);
 		glDeleteBuffers(1, &indBuffer);
 		glDeleteVertexArrays(1, &vao);
+
+		glDeleteTextures(1, &texKingWhite);
+		glDeleteTextures(1, &texQueenWhite);
+		glDeleteTextures(1, &texRookWhite);
+		glDeleteTextures(1, &texKnightWhite);
+		glDeleteTextures(1, &texBishopWhite);
+		glDeleteTextures(1, &texPawnWhite);
+
+		glDeleteTextures(1, &texKingBlack);
+		glDeleteTextures(1, &texQueenBlack);
+		glDeleteTextures(1, &texRookBlack);
+		glDeleteTextures(1, &texKnightBlack);
+		glDeleteTextures(1, &texBishopBlack);
+		glDeleteTextures(1, &texPawnBlack);
 	}
 };
 
-START_APP(my_app);
+int main()
+{
+	my_app* app = new my_app;
+	app->run();
+	delete app;
+	return 0;
+}

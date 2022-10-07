@@ -43,6 +43,15 @@ namespace Eisen
 	{
 		glUniform3fv(glGetUniformLocation(program, name.c_str()), 1, &data[0]);
 	}
+	void setVec4(GLuint program, std::string name, float x, float y, float z, float a)
+	{
+		glUniform4f(glGetUniformLocation(program, name.c_str()), x, y, z, a);
+	}
+
+	void setVec4(GLuint program, std::string name, const glm::vec4& data)
+	{
+		glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, &data[0]);
+	}
 
 	void setTexture(GLuint program, std::string name, int destination)
 	{

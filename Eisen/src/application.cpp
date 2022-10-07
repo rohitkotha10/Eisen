@@ -4,12 +4,14 @@ namespace Eisen
 {
 	void OpenGLApp::run()
 	{
-		init();
-
 		glfwInit();
+
+		init();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, info.MajorVersion);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, info.MinorVersion);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_RESIZABLE, info.resize);
+
 
 		//create window from here
 

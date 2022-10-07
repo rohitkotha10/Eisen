@@ -262,4 +262,10 @@ public:
 	}
 };
 
-START_APP(my_app);
+int main()
+{
+	my_app* app = new my_app;
+	app->run();
+	delete app;
+	return 0;
+}

@@ -19,12 +19,12 @@
     <None Include="res\shaders\vs.shader" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\chess.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\pieces.h">
+    <ClInclude Include="src\chess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
