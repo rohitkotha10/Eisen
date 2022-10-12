@@ -52,9 +52,11 @@ class my_app : public OpenGLApp
 	GLuint texPawnBlack;
 
 	map<string, string> chessTable;
-	int status;
+	int startGame;
 	int preview; //is move display on or off
 	string curPreview; //current preview position
+	string prevStart;
+	string prevEnd;
 	int turn; //0 for black, 1 for white
 	int counter;
 
@@ -68,7 +70,7 @@ public:
 		info.title = "Chess";
 		info.color = new float[4] {0.2f, 0.2f, 0.2f, 1.0f};
 		info.fullscreen = false;
-		info.resize = 0;
+		info.resize = false;
 	}
 
 	void shaderCompile()
@@ -124,9 +126,6 @@ public:
 
 	void startup()
 	{
-		std::cout << glGetString(GL_VENDOR) << std::endl;
-		std::cout << glGetString(GL_VERSION) << std::endl;
-		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
 
 		cout << "Welcome to CHESS!!!\n";
 		cout << "White to Start\n1: ";
@@ -233,7 +232,7 @@ public:
 		chessTable["g7"] = "bp";
 		chessTable["h7"] = "bp";
 
-		status = 0;
+		startGame = 0;
 		preview = 0;
 		turn = 1;
 		counter = 1;
@@ -282,6 +281,12 @@ public:
 			getPreview(program, chessTable, curPreview);
 		}
 
+		if (startGame == 1)
+		{
+			paintPiece(program, prevStart);
+			paintPiece(program, prevEnd);
+		}
+
 		for (pair<string, string> cur : chessTable)
 		{
 			if (cur.second == "empty")
@@ -313,45 +318,47 @@ public:
 				place(program, texKingBlack, cur.first);
 		}
 
-		onClick();
+		if (press == 1)
+		{
+			onClick();
+			press = 0;
+		}
 	}
 
 	void onClick()
 	{
-		if (press == 1)
+		string curSel = getPos(xmouse, ymouse);
+		string curPiece = chessTable[curSel];
+		if ((curPiece[0] == 'w' && turn == 1) || (curPiece[0] == 'b' && turn == 0))
 		{
-			string curSel = getPos(xmouse, ymouse);
-			string curPiece = chessTable[curSel];
-			if ((curPiece[0] == 'w' && turn == 1) || (curPiece[0] == 'b' && turn == 0))
-			{
-				preview = 1;
-				curPreview = curSel;
-			}
+			preview = 1;
+			curPreview = curSel;
+		}
 
-			else
+		else
+		{
+			if (preview == 1)
 			{
-				if (preview == 1)
+				//check if move is valid and proceed or else put preview to 0;
+				string query = curPreview + curSel;
+
+				if (processMove(chessTable, query) == 0)
 				{
-					//check if move is valid and proceed or else put preview to 0;
-					string query = curPreview + curSel;
-
-					if (processMove(chessTable, query) == 0)
+					startGame = 1;
+					cout << query << ' ';
+					if (turn == 0)
 					{
-						cout << query << ' ';
-						if (turn == 0)
-						{
-							counter++;
-							cout << endl;
-							cout << counter << ": ";
-						}
-						turn = 1 - turn;
+						counter++;
+						cout << endl;
+						cout << counter << ": ";
 					}
-
+					turn = 1 - turn;
+					prevStart = curPreview;
+					prevEnd = curSel;
 				}
-				preview = 0;
-			}
 
-			press = 0;
+			}
+			preview = 0;
 		}
 	}
 

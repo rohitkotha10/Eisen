@@ -36,6 +36,10 @@ namespace Eisen
 			return;
 		}
 
+		std::cout << glGetString(GL_VENDOR) << std::endl;
+		std::cout << glGetString(GL_VERSION) << std::endl;
+		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
+
 		//starts app from here
 		shaderCompile();
 		startup();
