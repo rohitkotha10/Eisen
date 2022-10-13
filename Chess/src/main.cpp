@@ -37,6 +37,7 @@ class my_app : public OpenGLApp
 	GLuint vao;
 	GLuint vertBuffer;
 	GLuint indBuffer;
+
 	GLuint texKingWhite;
 	GLuint texQueenWhite;
 	GLuint texRookWhite;
@@ -68,7 +69,7 @@ public:
 		info.MajorVersion = 4;
 		info.MinorVersion = 5;
 		info.title = "Chess";
-		info.color = new float[4] {0.2f, 0.2f, 0.2f, 1.0f};
+		info.color = new float[4] {0.4f, 0.4f, 0.4f, 1.0f};
 		info.fullscreen = false;
 		info.resize = false;
 	}
@@ -240,16 +241,8 @@ public:
 
 	void render(double currentTime)
 	{
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glUseProgram(program);
 		glBindVertexArray(vao);
-
-		setInt(program, "choice", 0);
-		setMat4(program, "trans_matrix", glm::mat4(1.0f));
-		setVec4(program, "color", glm::vec4(0.9f, 0.8f, 0.5f, 1.0f));
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glm::mat4 curMat = glm::mat4(1.0f);
 		int n = 10;
