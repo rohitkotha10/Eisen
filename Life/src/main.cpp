@@ -148,10 +148,6 @@ public:
 
 	void startup()
 	{
-		std::cout << glGetString(GL_VENDOR) << std::endl;
-		std::cout << glGetString(GL_VERSION) << std::endl;
-		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
-
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
 

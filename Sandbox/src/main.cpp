@@ -101,10 +101,6 @@ public:
 
 	void startup()
 	{
-		std::cout << glGetString(GL_VENDOR) << std::endl;
-		std::cout << glGetString(GL_VERSION) << std::endl;
-		std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
-
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		glfwSetKeyCallback(window, keyboard_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
@@ -185,6 +181,12 @@ public:
 
 	void render(double currentTime)
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		glClearBufferfi(GL_DEPTH_STENCIL, 0, 1, 0);
+
 		glUseProgram(program);
 		glBindVertexArray(vao);
 
@@ -196,6 +198,10 @@ public:
 
 		setInt(program, "tex0", 0);
 		setInt(program, "tex1", 1);
+
+		glm::mat4 curMat = glm::mat4(1.0f);
+		curMat = glm::rotate(curMat, (float)currentTime, glm::vec3(0.0f, 0.0f, 1.0f));
+		setMat4(program, "model_matrix", curMat);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
@@ -208,4 +214,10 @@ public:
 	}
 };
 
-START_APP(my_app);
+int main()
+{
+	my_app* app = new my_app;
+	app->run();
+	delete app;
+	return 0;
+}
