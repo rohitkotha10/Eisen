@@ -140,6 +140,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="src\fs.shader" />
     <None Include="src\README.md" />
     <None Include="src\vs.shader" />
