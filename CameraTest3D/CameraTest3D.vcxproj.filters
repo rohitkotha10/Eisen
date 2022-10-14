@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\fs.shader" />
-    <None Include="res\shaders\vs.shader" />
-    <None Include="README.md" />
-    <None Include="src\fs.shader" />
-    <None Include="src\vs.shader" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\vs.shader" />
+    <None Include="res\shaders\fs.shader" />
+    <None Include="src\fs.shader" />
+    <None Include="src\vs.shader" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

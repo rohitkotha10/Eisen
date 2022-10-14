@@ -75,7 +75,7 @@ public:
 	{
 		//vertex shader
 		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-		std::string trial = parse("res/shaders/vs.shader");
+		std::string trial = parse("src/vs.shader");
 		const GLchar* vsSource = trial.c_str();
 		glShaderSource(vs, 1, &vsSource, NULL);
 		glCompileShader(vs);
@@ -91,7 +91,7 @@ public:
 
 		//frag shader
 		GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-		trial = parse("res/shaders/fs.shader");
+		trial = parse("src/fs.shader");
 		const GLchar* fsSource = trial.c_str();
 		glShaderSource(fs, 1, &fsSource, NULL);
 		glCompileShader(fs);
@@ -180,19 +180,19 @@ public:
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
-		load_tex(texKingWhite, "res/media/wking.png", true);
-		load_tex(texQueenWhite, "res/media/wqueen.png", true);
-		load_tex(texRookWhite, "res/media/wrook.png", true);
-		load_tex(texKnightWhite, "res/media/wknight.png", true);
-		load_tex(texBishopWhite, "res/media/wbishop.png", true);
-		load_tex(texPawnWhite, "res/media/wpawn.png", true);
+		load_tex(texKingWhite, "../media/chess/wking.png", true);
+		load_tex(texQueenWhite, "../media/chess/wqueen.png", true);
+		load_tex(texRookWhite, "../media/chess/wrook.png", true);
+		load_tex(texKnightWhite, "../media/chess/wknight.png", true);
+		load_tex(texBishopWhite, "../media/chess/wbishop.png", true);
+		load_tex(texPawnWhite, "../media/chess/wpawn.png", true);
 
-		load_tex(texKingBlack, "res/media/bking.png", true);
-		load_tex(texQueenBlack, "res/media/bqueen.png", true);
-		load_tex(texRookBlack, "res/media/brook.png", true);
-		load_tex(texKnightBlack, "res/media/bknight.png", true);
-		load_tex(texBishopBlack, "res/media/bbishop.png", true);
-		load_tex(texPawnBlack, "res/media/bpawn.png", true);
+		load_tex(texKingBlack, "../media/chess/bking.png", true);
+		load_tex(texQueenBlack, "../media/chess/bqueen.png", true);
+		load_tex(texRookBlack, "../media/chess/brook.png", true);
+		load_tex(texKnightBlack, "../media/chess/bknight.png", true);
+		load_tex(texBishopBlack, "../media/chess/bbishop.png", true);
+		load_tex(texPawnBlack, "../media/chess/bpawn.png", true);
 
 		chessTable["a1"] = "wr";
 		chessTable["b1"] = "wn";

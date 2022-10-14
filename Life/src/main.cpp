@@ -10,6 +10,18 @@ extern "C" {
 using namespace std;
 using namespace Eisen;
 
+int screen_width = 800;
+int screen_height = 800;
+float screen_aspect = (float)screen_width / (float)screen_height;
+float fov = 45.0f;
+
+glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraFront = glm::normalize(cameraTarget - cameraPos); //also facing the scene
+glm::vec3 cameraRight = glm::normalize(glm::cross(cameraFront, worldUp)); //camera is in left hand system
+glm::vec3 cameraUp = glm::normalize(glm::cross(cameraFront, cameraRight));
+
 int getCnt(int i, int j, vector<vector<char>> arr, int n, int m)
 {
 	if (i >= n || j >= m)
@@ -99,7 +111,7 @@ public:
 	{
 		//vertex shader
 		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-		std::string trial = parse("res/shaders/vs.shader");
+		std::string trial = parse("src/vs.shader");
 		const GLchar* vsSource = trial.c_str();
 		glShaderSource(vs, 1, &vsSource, NULL);
 		glCompileShader(vs);
@@ -115,7 +127,7 @@ public:
 
 		//frag shader
 		GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-		trial = parse("res/shaders/fs.shader");
+		trial = parse("src/fs.shader");
 		const GLchar* fsSource = trial.c_str();
 		glShaderSource(fs, 1, &fsSource, NULL);
 		glCompileShader(fs);
@@ -178,8 +190,8 @@ public:
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
 
-		int n = 64;
-		int m = 64;
+		int n = 50;
+		int m = 50;
 		vector<vector<char>> temp(n, vector<char>(m));
 		for (int i = 0; i < n; i++)
 		{
@@ -214,7 +226,7 @@ public:
 		setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glm::mat4 curMat = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 
 		int n = (int)curConway.size();
 		int m = (int)curConway[0].size();
@@ -234,15 +246,19 @@ public:
 		{
 			for (int j = 0; j < m; j++)
 			{
-				if (curConway[i][j] == '0')
+				if (curConway[i][j] == '1')
 				{
 					float xshift = -1.0f + (2 * j + 1) * incr;
 					float yshift = 1.0f - (2 * i + 1) * incr;
-					curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-					curMat = glm::scale(curMat, glm::vec3(scale));
+					model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+					model = glm::scale(model, glm::vec3(scale));
 
-					setMat4(program, "trans_matrix", curMat);
-					setVec3(program, "color", glm::vec3(0.0f, 0.0f, 0.0f));
+					glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+					glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+					glm::mat4 mvp = projection * view * model;
+
+					setMat4(program, "mvp_matrix", mvp);
+					setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
 					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 				}
 			}

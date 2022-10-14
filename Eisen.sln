@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Life", "Life\Life.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chess", "Chess\Chess.vcxproj", "{F7A58A45-D582-4AF5-82FC-5783BEFF613E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraTest3D", "CameraTest3D\CameraTest3D.vcxproj", "{618B5713-1C3A-4C94-B1F8-E746B1D4854C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{F7A58A45-D582-4AF5-82FC-5783BEFF613E}.Release|x64.Build.0 = Release|x64
 		{F7A58A45-D582-4AF5-82FC-5783BEFF613E}.Release|x86.ActiveCfg = Release|Win32
 		{F7A58A45-D582-4AF5-82FC-5783BEFF613E}.Release|x86.Build.0 = Release|Win32
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Debug|x64.ActiveCfg = Debug|x64
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Debug|x64.Build.0 = Debug|x64
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Debug|x86.ActiveCfg = Debug|Win32
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Debug|x86.Build.0 = Debug|Win32
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Release|x64.ActiveCfg = Release|x64
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Release|x64.Build.0 = Release|x64
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Release|x86.ActiveCfg = Release|Win32
+		{618B5713-1C3A-4C94-B1F8-E746B1D4854C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

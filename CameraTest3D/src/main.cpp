@@ -123,7 +123,7 @@ public:
 		info.height = screen_height;
 		info.MajorVersion = 4;
 		info.MinorVersion = 6;
-		info.title = "Camera Test";
+		info.title = "Sandbox";
 		info.color = new float[4] {0.1f, 0.1f, 0.1f, 0.1f};
 		info.fullscreen = false;
 		info.resize = false;
