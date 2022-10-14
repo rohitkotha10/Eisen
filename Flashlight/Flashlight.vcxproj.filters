@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\vs.shader" />
-    <None Include="res\shaders\fs.shader" />
-    <None Include="src\fs.shader" />
     <None Include="src\vs.shader" />
-    <None Include="README.md" />
+    <None Include="src\fs.shader" />
+    <None Include="src\README.md" />
+    <None Include="src\fsLight.shader" />
+    <None Include="src\vsLight.shader" />
   </ItemGroup>
 </Project>

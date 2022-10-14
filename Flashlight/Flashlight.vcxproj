@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{618b5713-1c3a-4c94-b1f8-e746b1d4854c}</ProjectGuid>
-    <RootNamespace>CameraTest3D</RootNamespace>
+    <ProjectGuid>{c9266ae8-5e7a-4d88-bb6b-9833b127b03e}</ProjectGuid>
+    <RootNamespace>Flashlight</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -132,19 +132,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
-    <None Include="res\shaders\fs.shader" />
-    <None Include="res\shaders\vs.shader" />
-    <None Include="src\fs.shader" />
-    <None Include="src\vs.shader" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Eisen\Eisen.vcxproj">
       <Project>{c87c7ec5-51e5-471a-811e-c0adfa2434c6}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\fs.shader" />
+    <None Include="src\fsLight.shader" />
+    <None Include="src\README.md" />
+    <None Include="src\vs.shader" />
+    <None Include="src\vsLight.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

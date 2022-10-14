@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="res\shaders\fs.shader" />
     <None Include="res\shaders\vs.shader" />
     <None Include="src\fs.shader" />

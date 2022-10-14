@@ -19,6 +19,7 @@
     <None Include="res\shaders\vs.shader" />
     <None Include="src\fs.shader" />
     <None Include="src\vs.shader" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
