@@ -141,10 +141,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\fs.shader" />
-    <None Include="src\fsLight.shader" />
     <None Include="src\README.md" />
     <None Include="src\vs.shader" />
-    <None Include="src\vsLight.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

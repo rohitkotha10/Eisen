@@ -5,10 +5,6 @@ OpenGL Application.
 - You will need `Visual Studio 2022` with `C++` Desktop Environment to Build this Solution.
 - Build the solution and then select one of the projects as a startup project to test it.
 
-## Examples and Projects
-- Chess
-- Life
-
 ## Ideas and Tasks
 - 3D
 - Batch renderer
@@ -20,6 +16,7 @@ OpenGL Application.
 - glad
 - stb image loader
 - glm math
+- assimp model importer (needs dll at runtime)
 
 ## Resources and Reference Links
 - OpenGL Superbible book

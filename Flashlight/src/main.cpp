@@ -1,4 +1,5 @@
 #include "Eisen.h"
+#include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -12,6 +13,7 @@ using namespace Eisen;
 using namespace std;
 
 bool firstMouse = true;
+bool isFlash = false;
 int press = 0;
 
 int screen_width = 1280;
@@ -50,6 +52,9 @@ void  keyboard_callback(GLFWwindow* window, int key, int scancode, int action, i
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+		isFlash = 1 - isFlash;
 };
 
 void cursor_callback(GLFWwindow* window, double xdpos, double ydpos)
@@ -104,14 +109,25 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 class my_app : public OpenGLApp
 {
 	GLuint program;
-	GLuint programLight;
 
 	GLuint vao;
-	GLuint vaoLight;
 
 	GLuint vertBuffer;
 	GLuint tex0;
 	GLuint tex1;
+
+	vector<glm::vec3> cubePositions = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
 
 	glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
@@ -179,55 +195,6 @@ public:
 
 		glDeleteShader(vs);
 		glDeleteShader(fs);
-
-		lightShader();
-	}
-
-	void lightShader()
-	{
-		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-		std::string trial = parse("src/vsLight.shader");
-		const GLchar* vsSource = trial.c_str();
-		glShaderSource(vs, 1, &vsSource, NULL);
-		glCompileShader(vs);
-
-		int success;
-		glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			char infoLog[512];
-			glGetShaderInfoLog(vs, 512, NULL, infoLog);
-			std::cout << "Vertex Shader Error\n" << infoLog << std::endl;
-		}
-
-		//frag shader
-		GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-		trial = parse("src/fsLight.shader");
-		const GLchar* fsSource = trial.c_str();
-		glShaderSource(fs, 1, &fsSource, NULL);
-		glCompileShader(fs);
-
-		success = 0;
-		glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
-			char infoLog[512];
-			glGetShaderInfoLog(fs, 512, NULL, infoLog);
-			std::cout << "Frag Shader Error\n" << infoLog << std::endl;
-		}
-
-		programLight = glCreateProgram();
-		glAttachShader(programLight, vs);
-		glAttachShader(programLight, fs);
-		glLinkProgram(programLight);
-
-		success = 0;
-		glGetProgramiv(programLight, GL_LINK_STATUS, &success);
-		if (!success) {
-			char infoLog[512];
-			glGetProgramInfoLog(programLight, 512, NULL, infoLog);
-			std::cout << "Shader Linking Error\n" << infoLog << std::endl;
-		}
 	}
 
 	void startup()
@@ -284,7 +251,6 @@ public:
 		};
 
 		glGenVertexArrays(1, &vao);
-		glGenVertexArrays(1, &vaoLight);
 
 		glGenBuffers(1, &vertBuffer);
 
@@ -344,14 +310,6 @@ public:
 		}
 		stbi_image_free(data);
 
-		glBindVertexArray(vaoLight);
-
-		glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
 	}
 
 	void render(double currentTime)
@@ -372,40 +330,38 @@ public:
 
 		setInt(program, "tex0", 0);
 		setInt(program, "tex1", 1);
-
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), objectPos);
-		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
-		glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
-
-		glm::mat4 mvp = projection * view * model;
-
-		setMat4(program, "model_matrix", model);
-		setMat4(program, "view_matrix", view);
-		setMat4(program, "projection_matrix", projection);
-
 		setVec3(program, "lightPos", lightPos);
 
 		setVec3(program, "viewPos", cameraPos);
-		setVec3(program, "light.position", lightPos);
+
+		setVec3(program, "light.position", cameraPos);
+		setVec3(program, "light.direction", cameraFront);
 		setVec3(program, "light.color", lightColor);
+		setFloat(program, "light.cutoff", glm::cos(glm::radians(7.5f)));
+		setFloat(program, "light.outerCutoff", glm::cos(glm::radians(12.5f)));
+		setFloat(program, "light.constant", 1.0f); //attenuation
+		setFloat(program, "light.linear", 0.09f);
+		setFloat(program, "light.quadratic", 0.032f);
+
 		setVec3(program, "material.color", 1.0f, 0.5f, 0.5f);
 		setFloat(program, "material.shininess", 32.0f);
-		setFloat(program, "material.ambientStrength", 0.1f);
+		setFloat(program, "material.ambientStrength", 0.5f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+		glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
+		setMat4(program, "view_matrix", view);
+		setMat4(program, "projection_matrix", projection);
+		setBool(program, "isFlash", isFlash);
+		for (int i = 0; i < 10; i++)
+		{
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			setMat4(program, "model_matrix", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		glUseProgram(programLight);
-		glBindVertexArray(vaoLight);
+		}
 
-		glm::mat4 modelLight = glm::translate(glm::mat4(1.0f), lightPos);
-		modelLight = glm::scale(modelLight, glm::vec3(0.2f));
-
-		setMat4(programLight, "model_matrix", modelLight);
-		setMat4(programLight, "view_matrix", view);
-		setMat4(programLight, "projection_matrix", projection);
-		setVec3(programLight, "color", lightColor);
-
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		onKeyUpdate();
 	}
@@ -431,10 +387,8 @@ public:
 	void shutdown()
 	{
 		glDeleteProgram(program);
-		glDeleteProgram(programLight);
 		glDeleteBuffers(1, &vertBuffer);
 		glDeleteVertexArrays(1, &vao);
-		glDeleteVertexArrays(1, &vaoLight);
 
 		glDeleteTextures(1, &tex0);
 		glDeleteTextures(1, &tex1);
