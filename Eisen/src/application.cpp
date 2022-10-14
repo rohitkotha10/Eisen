@@ -51,7 +51,7 @@ namespace Eisen
 		while (!glfwWindowShouldClose(window))
 		{
 			glClearColor(info.color[0], info.color[1], info.color[2], info.color[3]);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			render(glfwGetTime());
 

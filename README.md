@@ -25,3 +25,4 @@ OpenGL Application.
 - OpenGL Superbible book
 - Learn OpenGL website: `https://learnopengl.com`
 - The Cherno Youtube channel and github: `https://github.com/TheCherno`
+- Scratchapixel website `https://www.scratchapixel.com`

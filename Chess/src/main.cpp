@@ -1,12 +1,9 @@
 #include "chess.h"
 
 #include <windows.h>
-//extern "C" {
-//	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-//}//force GPU use
-
-int xmouse, ymouse;
-int press = 0;
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}//force GPU use
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -69,7 +66,7 @@ public:
 		info.MajorVersion = 4;
 		info.MinorVersion = 5;
 		info.title = "Chess";
-		info.color = new float[4] {0.4f, 0.4f, 0.4f, 1.0f};
+		info.color = new float[4] {0.1f, 0.1f, 0.1f, 1.0f};
 		info.fullscreen = false;
 		info.resize = false;
 	}
@@ -237,6 +234,8 @@ public:
 		preview = 0;
 		turn = 1;
 		counter = 1;
+
+
 	}
 
 	void render(double currentTime)
@@ -244,7 +243,7 @@ public:
 		glUseProgram(program);
 		glBindVertexArray(vao);
 
-		glm::mat4 curMat = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 		int n = 10;
 
 		float scale = 1.0f / n;
@@ -259,11 +258,16 @@ public:
 					setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 				float xshift = -1.0f + (2 * i + 1) * incr;
 				float yshift = -1.0f + (2 * j + 1) * incr;
-				curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-				curMat = glm::scale(curMat, glm::vec3(scale));
+				model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+				model = glm::scale(model, glm::vec3(scale));
 
 				setInt(program, "choice", 0);
-				setMat4(program, "trans_matrix", curMat);
+				setInt(program, "outChoice", 0);
+				glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+				glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+				glm::mat4 mvp = projection * view * model;
+
+				setMat4(program, "mvp_matrix", mvp);
 				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			}

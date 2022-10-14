@@ -12,6 +12,21 @@
 using namespace std;
 using namespace Eisen;
 
+int xmouse, ymouse;
+int press = 0;
+
+int screen_width = 800;
+int screen_height = 800;
+float screen_aspect = (float)screen_width / (float)screen_height;
+float fov = 45.0f;
+
+glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cameraFront = glm::normalize(cameraTarget - cameraPos); //also facing the scene
+glm::vec3 cameraRight = glm::normalize(glm::cross(cameraFront, worldUp)); //camera is in left hand system
+glm::vec3 cameraUp = glm::normalize(glm::cross(cameraFront, cameraRight));
+
 string getPos(int xpos, int ypos) //for mouse picking
 {
 	int file = 'a' - 1; //0 in alphabet
@@ -30,7 +45,7 @@ void paintBox(GLuint& program, string place, int occupy)
 {
 	int i = place[0] - ('a' - 1);
 	int j = place[1] - ('1' - 1);
-	glm::mat4 curMat = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f);
 	int n = 10;
 
 	float scale = 1.0f / n;
@@ -38,11 +53,17 @@ void paintBox(GLuint& program, string place, int occupy)
 
 	float xshift = -1.0f + (2 * i + 1) * incr;
 	float yshift = -1.0f + (2 * j + 1) * incr;
-	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-	curMat = glm::scale(curMat, glm::vec3(scale));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+	model = glm::scale(model, glm::vec3(scale));
 
 	setInt(program, "choice", 2);
-	setMat4(program, "trans_matrix", curMat);
+	setInt(program, "outChoice", 2);
+
+	glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+	glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+	glm::mat4 mvp = projection * view * model;
+
+	setMat4(program, "mvp_matrix", mvp);
 	setInt(program, "occupy", occupy);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -51,7 +72,7 @@ void paintPiece(GLuint& program, string place)
 {
 	int i = place[0] - ('a' - 1);
 	int j = place[1] - ('1' - 1);
-	glm::mat4 curMat = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f);
 	int n = 10;
 
 	float scale = 1.0f / n;
@@ -59,12 +80,17 @@ void paintPiece(GLuint& program, string place)
 
 	float xshift = -1.0f + (2 * i + 1) * incr;
 	float yshift = -1.0f + (2 * j + 1) * incr;
-	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-	curMat = glm::scale(curMat, glm::vec3(scale));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+	model = glm::scale(model, glm::vec3(scale));
 
-	setInt(program, "choice", 0);
+	setInt(program, "choice", 1);
+	setInt(program, "outChoice", 1);
 	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 0.0f, 0.6f));
-	setMat4(program, "trans_matrix", curMat);
+	glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+	glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+	glm::mat4 mvp = projection * view * model;
+
+	setMat4(program, "mvp_matrix", mvp);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -88,7 +114,7 @@ void place(GLuint& program, GLuint& piece, string place)
 {
 	int i = place[0] - ('a' - 1);
 	int j = place[1] - ('1' - 1);
-	glm::mat4 curMat = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f);
 	int n = 10;
 
 	float scale = 1.0f / n;
@@ -96,11 +122,16 @@ void place(GLuint& program, GLuint& piece, string place)
 
 	float xshift = -1.0f + (2 * i + 1) * incr;
 	float yshift = -1.0f + (2 * j + 1) * incr;
-	curMat = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-	curMat = glm::scale(curMat, glm::vec3(scale));
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
+	model = glm::scale(model, glm::vec3(scale));
 
-	setInt(program, "choice", 1);
-	setMat4(program, "trans_matrix", curMat);
+	setInt(program, "choice", 3);
+	setInt(program, "outChoice", 3);
+	glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+	glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+	glm::mat4 mvp = projection * view * model;
+
+	setMat4(program, "mvp_matrix", mvp);
 	setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, piece);

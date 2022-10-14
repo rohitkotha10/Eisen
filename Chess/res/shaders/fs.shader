@@ -7,16 +7,14 @@ in vec2 pixelPos;
 
 uniform sampler2D tex0;
 uniform vec4 color;
-uniform int choice;
+uniform int outChoice;
 uniform int occupy;
 
 void main()
 {
-	if (choice == 0)
+	if (outChoice == 0 || outChoice == 1)
 		FragColor = color;
-	else if (choice == 1)
-		FragColor = texture(tex0, texPos);
-	else if (choice == 2)
+	else if (outChoice == 2)
 	{
 		float distance = length(pixelPos);
 		if (occupy == 0) //no one here, can move
@@ -36,6 +34,8 @@ void main()
 		}
 
 	}
+	else if (outChoice == 3)
+		FragColor = texture(tex0, texPos);
 
 
 };
