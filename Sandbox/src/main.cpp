@@ -1,12 +1,9 @@
-#include "Eisen.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 #include <windows.h>
 extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }//force GPU use
+
+#include "Eisen.h"
 
 using namespace Eisen;
 using namespace std;
@@ -61,12 +58,6 @@ void cursor_callback(GLFWwindow* window, double xdpos, double ydpos)
 	{
 		lastX = xpos;
 		lastY = ypos;
-
-		pitch = glm::degrees(asin(cameraFront.y));
-		yaw = glm::degrees(asin(cameraFront.z / cos(pitch)));
-
-		cout << pitch << ' ' << yaw << endl;
-
 		firstMouse = false;
 	}
 
@@ -110,11 +101,11 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 class my_app : public OpenGLApp
 {
 	GLuint program;
-	GLuint vao;
-	GLuint vertBuffer;
-	GLuint indBuffer;
-	GLuint tex0;
-	GLuint tex1;
+
+	glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	Model ourModel;
+	int start = 0;
+	Timer t1;
 
 public:
 	void init()
@@ -122,8 +113,8 @@ public:
 		info.width = screen_width;
 		info.height = screen_height;
 		info.MajorVersion = 4;
-		info.MinorVersion = 6;
-		info.title = "Camera Test";
+		info.MinorVersion = 5;
+		info.title = "Sandbox";
 		info.color = new float[4] {0.1f, 0.1f, 0.1f, 0.1f};
 		info.fullscreen = false;
 		info.resize = false;
@@ -188,108 +179,8 @@ public:
 		glfwSetMouseButtonCallback(window, mouse_button_callback);
 		glfwSetScrollCallback(window, scroll_callback);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-		static const GLfloat vertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f };
-
-		glGenVertexArrays(1, &vao);
-
-		glGenBuffers(1, &vertBuffer);
-		glGenBuffers(1, &indBuffer);
-
-		glGenTextures(1, &tex0);
-		glGenTextures(1, &tex1);
-
-		glBindVertexArray(vao);
-
-		glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-		glBindTexture(GL_TEXTURE_2D, tex0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_set_flip_vertically_on_load(true);
-		int width, height, nrChannels;
-		unsigned char* data = stbi_load("../media/smile.jpg", &width, &height, &nrChannels, 0);
-		if (data)
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-		else
-		{
-			std::cout << "Failed to load texture" << std::endl;
-		}
-		stbi_image_free(data);
-
-		glBindTexture(GL_TEXTURE_2D, tex1);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_set_flip_vertically_on_load(true);
-		data = stbi_load("../media/wood.jpg", &width, &height, &nrChannels, 0);
-		if (data)
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-		else
-		{
-			std::cout << "Failed to load texture" << std::endl;
-		}
-		stbi_image_free(data);
-
+		t1.start("Renderfunc");
+		ourModel.loadModel("../media/backpack/backpack.obj");
 	}
 
 	void render(double currentTime)
@@ -300,26 +191,20 @@ public:
 		lastFrame = currentFrame;
 
 		glUseProgram(program);
-		glBindVertexArray(vao);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex0);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, tex1);
-
-		setInt(program, "tex0", 0);
-		setInt(program, "tex1", 1);
-
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.0f, 0.0f));
-
+		glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
 		glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
-		glm::mat4 mvp = projection * view * model;
+		setMat4(program, "view_matrix", view);
+		setMat4(program, "projection_matrix", projection);
+		setMat4(program, "model_matrix", model);
 
-		setMat4(program, "mvp_matrix", mvp);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
+		ourModel.draw(program);
+		if (start == 0)
+		{
+			t1.display();
+			start = 1;
+		}
 		onKeyUpdate();
 	}
 
@@ -344,12 +229,6 @@ public:
 	void shutdown()
 	{
 		glDeleteProgram(program);
-		glDeleteBuffers(1, &vertBuffer);
-		glDeleteBuffers(1, &indBuffer);
-		glDeleteVertexArrays(1, &vao);
-
-		glDeleteTextures(1, &tex0);
-		glDeleteTextures(1, &tex1);
 	}
 };
 

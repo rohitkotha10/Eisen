@@ -1,11 +1,12 @@
-#include "Eisen.h"
-
-#include <vector>
-
 #include <windows.h>
 extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }//force GPU use
+#include <vector>
+
+#include "Eisen.h"
+
+
 
 using namespace std;
 using namespace Eisen;

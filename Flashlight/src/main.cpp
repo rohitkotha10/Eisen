@@ -1,13 +1,13 @@
+#include <windows.h>
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}//force GPU use
+
 #include "Eisen.h"
 #include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#include <windows.h>
-extern "C" {
-	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-}//force GPU use
 
 using namespace Eisen;
 using namespace std;

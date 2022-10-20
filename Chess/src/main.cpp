@@ -1,9 +1,9 @@
-#include "chess.h"
-
 #include <windows.h>
 extern "C" {
 	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }//force GPU use
+
+#include "chess.h"
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
