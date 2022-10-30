@@ -9,22 +9,20 @@
 
 using namespace std;
 
-namespace Eisen
-{
-	class Model
-	{
-	public:
-		void loadModel(string path);
-		void draw(GLuint& program);
-	private:
-		vector<Mesh> meshes;
-		string directory;
-		vector<Texture> textures_loaded;
+namespace Eisen {
+    class Model {
+    public:
+        void loadModel(string path);
+        void draw(GLuint& program);
 
-		void processNode(aiNode* node, const aiScene* scene);
-		Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-		vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
-	};
+    private:
+        vector<Mesh> meshes;
+        string directory;
+        vector<Texture> textures_loaded;
 
-}
+        void processNode(aiNode* node, const aiScene* scene);
+        Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+        vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+    };
 
+}  // namespace Eisen

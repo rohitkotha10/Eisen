@@ -13,39 +13,34 @@
 
 using namespace std;
 
+namespace Eisen {
+    struct Vertex {
+        glm::vec3 position;
+        glm::vec3 normal;
+        glm::vec2 texPos;
+    };
 
-namespace Eisen
-{
-	struct Vertex
-	{
-		glm::vec3 position;
-		glm::vec3 normal;
-		glm::vec2 texPos;
-	};
+    struct Texture {
+        GLuint id;
+        string type;
+        string path;
+    };
 
-	struct Texture
-	{
-		GLuint id;
-		string type;
-		string path;
-	};
+    class Mesh {
+    public:
+        vector<Vertex> vertices;
+        vector<GLuint> indices;
+        vector<Texture> textures;
 
-	class Mesh
-	{
-	public:
-		vector<Vertex> vertices;
-		vector<GLuint> indices;
-		vector<Texture> textures;
+        Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
+        void draw(GLuint& program);
 
-		Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
-		void draw(GLuint& program);
+    private:
+        GLuint vao;
+        GLuint vbo;
+        GLuint ebo;
 
-	private:
-		GLuint vao;
-		GLuint vbo;
-		GLuint ebo;
+        void setupMesh();
+    };
 
-		void setupMesh();
-	};
-
-}
+}  // namespace Eisen
