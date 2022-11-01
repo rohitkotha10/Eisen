@@ -1,9 +1,9 @@
 # Eisen
-OpenGL Application.
+Graphics/Game Engine
 
 ## Build Instructions
 - This is tested on `Windows 10`
-- You will need `Visual Studio 2022` with `C++` Desktop Environment to Build this Solution.
+- Required `Visual Studio 2022` with `C++` Desktop Environment
 - media files can be found [Here](https://drive.google.com/drive/folders/1M9nEB5NIiM-aF9Dx5cFRd3_WJqrDXg9J?usp=sharing)
 - you need to copy the dll files manually to the output folder
 
@@ -19,3 +19,4 @@ OpenGL Application.
 - [Learn OpenGL](https://learnopengl.com)
 - [The Cherno Youtube](https://www.youtube.com/c/TheChernoProject) and [The Cherno Github](https://github.com/TheCherno)
 - [Scratchapixel](https://www.scratchapixel.com)
+- [RasterTek](https://www.rastertek.com)
