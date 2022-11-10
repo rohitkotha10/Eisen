@@ -6,6 +6,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <stb_image.h>
+
 #include <string>
 #include <vector>
 
@@ -18,6 +20,8 @@ namespace Eisen {
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec2 texPos;
+        glm::vec4 color;
+        float texIndex;
     };
 
     struct Texture {
@@ -26,21 +30,34 @@ namespace Eisen {
         string path;
     };
 
+    Texture loadMeshTexture(string path, string typeName);
+
     class Mesh {
     public:
         vector<Vertex> vertices;
         vector<GLuint> indices;
-        vector<Texture> textures;
+        Texture texture;
 
-        Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
-        void draw(GLuint& program);
+        void createMesh(vector<Vertex>& vertices, vector<GLuint>& indices, Texture& texture);
+    };
+
+    class Renderer {
+    public:
+        void init();
+        void beginBatch();
+        void endBatch();
+        void flush(GLuint& program);
+        void draw(GLuint& program, Mesh& mesh);
+        void shutdown();
 
     private:
         GLuint vao;
         GLuint vbo;
         GLuint ebo;
 
-        void setupMesh();
+        vector<Vertex> vertices;
+        vector<GLuint> indices;
+        vector<Texture> textures;
     };
 
 }  // namespace Eisen

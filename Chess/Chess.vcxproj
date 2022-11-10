@@ -140,7 +140,9 @@
     <None Include="src\vs.shader" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\chess.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\renderutil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Eisen\Eisen.vcxproj">
@@ -149,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\chess.h" />
+    <ClInclude Include="src\renderutil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

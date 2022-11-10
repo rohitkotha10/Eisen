@@ -21,9 +21,6 @@ namespace Eisen {
     void setFloat(GLuint program, std::string name, float value) {
         glUniform1f(glGetUniformLocation(program, name.c_str()), value);
     }
-    void setBool(GLuint program, std::string name, bool value) {
-        glUniform1i(glGetUniformLocation(program, name.c_str()), value);
-    }
     void setMat4(GLuint program, std::string name, const glm::mat4& data) {
         glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &data[0][0]);
     }
@@ -42,8 +39,8 @@ namespace Eisen {
         glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, &data[0]);
     }
 
-    void setTexture(GLuint program, std::string name, int destination) {
-        glUniform1i(glGetUniformLocation(program, name.c_str()), destination);
+    void setIntArray(GLuint program, std::string name, int size, int* data) {
+        glUniform1iv(glGetUniformLocation(program, name.c_str()), size, data);
     }
 
 }  // namespace Eisen

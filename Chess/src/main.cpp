@@ -3,7 +3,16 @@ extern "C" {
 _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }  // force GPU use
 
+#include "renderutil.h"
 #include "chess.h"
+
+int xmouse, ymouse;
+int press = 0;
+
+int screen_width = 800;
+int screen_height = 800;
+float screen_aspect = (float)screen_width / (float)screen_height;
+float fov = 45.0f;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) press = 1;
@@ -42,19 +51,17 @@ class my_app: public OpenGLApp {
     GLuint texBishopBlack;
     GLuint texPawnBlack;
 
-    map<string, string> chessTable;
+    MyGame myChess;
     int startGame;
     int preview;        // is move display on or off
     string curPreview;  // current preview position
     string prevStart;
     string prevEnd;
-    int turn;  // 0 for black, 1 for white
-    int counter;
 
 public:
     void init() {
-        info.width = 800;
-        info.height = 800;
+        info.width = screen_width;
+        info.height = screen_height;
         info.MajorVersion = 4;
         info.MinorVersion = 5;
         info.title = "Chess";
@@ -112,9 +119,6 @@ public:
     }
 
     void startup() {
-        cout << "Welcome to CHESS!!!\n";
-        cout << "White to Start\n1: ";
-
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         glfwSetKeyCallback(window, keyboard_callback);
         glfwSetCursorPosCallback(window, mouse_callback);
@@ -157,128 +161,37 @@ public:
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        load_tex(texKingWhite, "../media/chess/wking.png", true);
-        load_tex(texQueenWhite, "../media/chess/wqueen.png", true);
-        load_tex(texRookWhite, "../media/chess/wrook.png", true);
-        load_tex(texKnightWhite, "../media/chess/wknight.png", true);
-        load_tex(texBishopWhite, "../media/chess/wbishop.png", true);
-        load_tex(texPawnWhite, "../media/chess/wpawn.png", true);
+        load_texture(texKingWhite, "../media/chess/wking.png");
+        load_texture(texQueenWhite, "../media/chess/wqueen.png");
+        load_texture(texRookWhite, "../media/chess/wrook.png");
+        load_texture(texKnightWhite, "../media/chess/wknight.png");
+        load_texture(texBishopWhite, "../media/chess/wbishop.png");
+        load_texture(texPawnWhite, "../media/chess/wpawn.png");
 
-        load_tex(texKingBlack, "../media/chess/bking.png", true);
-        load_tex(texQueenBlack, "../media/chess/bqueen.png", true);
-        load_tex(texRookBlack, "../media/chess/brook.png", true);
-        load_tex(texKnightBlack, "../media/chess/bknight.png", true);
-        load_tex(texBishopBlack, "../media/chess/bbishop.png", true);
-        load_tex(texPawnBlack, "../media/chess/bpawn.png", true);
+        load_texture(texKingBlack, "../media/chess/bking.png");
+        load_texture(texQueenBlack, "../media/chess/bqueen.png");
+        load_texture(texRookBlack, "../media/chess/brook.png");
+        load_texture(texKnightBlack, "../media/chess/bknight.png");
+        load_texture(texBishopBlack, "../media/chess/bbishop.png");
+        load_texture(texPawnBlack, "../media/chess/bpawn.png");
 
-        chessTable["a1"] = "wr";
-        chessTable["b1"] = "wn";
-        chessTable["c1"] = "wb";
-        chessTable["d1"] = "wq";
-        chessTable["e1"] = "wk";
-        chessTable["f1"] = "wb";
-        chessTable["g1"] = "wn";
-        chessTable["h1"] = "wr";
-
-        chessTable["a2"] = "wp";
-        chessTable["b2"] = "wp";
-        chessTable["c2"] = "wp";
-        chessTable["d2"] = "wp";
-        chessTable["e2"] = "wp";
-        chessTable["f2"] = "wp";
-        chessTable["g2"] = "wp";
-        chessTable["h2"] = "wp";
-
-        chessTable["a8"] = "br";
-        chessTable["b8"] = "bn";
-        chessTable["c8"] = "bb";
-        chessTable["d8"] = "bq";
-        chessTable["e8"] = "bk";
-        chessTable["f8"] = "bb";
-        chessTable["g8"] = "bn";
-        chessTable["h8"] = "br";
-
-        chessTable["a7"] = "bp";
-        chessTable["b7"] = "bp";
-        chessTable["c7"] = "bp";
-        chessTable["d7"] = "bp";
-        chessTable["e7"] = "bp";
-        chessTable["f7"] = "bp";
-        chessTable["g7"] = "bp";
-        chessTable["h7"] = "bp";
-
-        startGame = 0;
-        preview = 0;
-        turn = 1;
-        counter = 1;
+        cout << "Welcome to CHESS!!!\n";
+        cout << "White to Start\n1: ";
     }
 
     void render(double currentTime) {
         glUseProgram(program);
         glBindVertexArray(vao);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        int n = 10;
+        drawBoard(program, glm::vec4(0.5f, 0.6f, 0.3f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-        float scale = 1.0f / n;
-        float incr = scale;
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                if ((i + j) % 2 == 0)
-                    setVec4(program, "color", glm::vec4(0.5f, 0.6f, 0.3f, 1.0f));
-                else
-                    setVec4(program, "color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-                float xshift = -1.0f + (2 * i + 1) * incr;
-                float yshift = -1.0f + (2 * j + 1) * incr;
-                model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-                model = glm::scale(model, glm::vec3(scale));
+        // if (preview == 1) { getPreview(program, chessTable, curPreview, allowed); }
 
-                setInt(program, "choice", 0);
-                setInt(program, "outChoice", 0);
-                glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
-                glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
-                glm::mat4 mvp = projection * view * model;
-
-                setMat4(program, "mvp_matrix", mvp);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-            }
+        if (startGame == 1) {  // Recent History track
+            paintBox(program, prevStart);
+            paintBox(program, prevEnd);
         }
-
-        if (preview == 1) { getPreview(program, chessTable, curPreview); }
-
-        if (startGame == 1) {
-            paintPiece(program, prevStart);
-            paintPiece(program, prevEnd);
-        }
-
-        for (pair<string, string> cur: chessTable) {
-            if (cur.second == "empty") continue;
-            if (cur.second == "wp")
-                place(program, texPawnWhite, cur.first);
-            else if (cur.second == "wr")
-                place(program, texRookWhite, cur.first);
-            else if (cur.second == "wn")
-                place(program, texKnightWhite, cur.first);
-            else if (cur.second == "wb")
-                place(program, texBishopWhite, cur.first);
-            else if (cur.second == "wq")
-                place(program, texQueenWhite, cur.first);
-            else if (cur.second == "wk")
-                place(program, texKingWhite, cur.first);
-
-            else if (cur.second == "bp")
-                place(program, texPawnBlack, cur.first);
-            else if (cur.second == "br")
-                place(program, texRookBlack, cur.first);
-            else if (cur.second == "bn")
-                place(program, texKnightBlack, cur.first);
-            else if (cur.second == "bb")
-                place(program, texBishopBlack, cur.first);
-            else if (cur.second == "bq")
-                place(program, texQueenBlack, cur.first);
-            else if (cur.second == "bk")
-                place(program, texKingBlack, cur.first);
-        }
+        drawPieces(program, myChess);
 
         if (press == 1) {
             onClick();
@@ -287,19 +200,18 @@ public:
     }
 
     void onClick() {
-        string curSel = getPos(xmouse, ymouse);
+        string curSel = getPointer(xmouse, ymouse);
         string curPiece = chessTable[curSel];
         if ((curPiece[0] == 'w' && turn == 1) || (curPiece[0] == 'b' && turn == 0)) {
             preview = 1;
             curPreview = curSel;
-        }
-
-        else {
+        } else {
             if (preview == 1) {
-                // check if move is valid and proceed or else put preview to 0;
+                // check if move is valid and proceed
+                // in the end put preview 0
                 string query = curPreview + curSel;
 
-                if (processMove(chessTable, query) == 0) {
+                if (processMove(chessTable, query, allowed) == 0) {
                     startGame = 1;
                     cout << query << ' ';
                     if (turn == 0) {

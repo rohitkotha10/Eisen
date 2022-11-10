@@ -191,14 +191,14 @@ public:
 
         float scale = 1.0f / max(n, m);
         float incr = scale;
-        curConway = conway_life(curConway, n, m);
+        //curConway = conway_life(curConway, n, m);
 
-        /*float stepTime = 1;
+        float stepTime = 1;
         if (currentTime > startTime)
         {
                 curConway = conway_life(curConway, n, m);
                 startTime += stepTime;
-        }*/
+        }
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {

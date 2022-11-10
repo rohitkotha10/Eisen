@@ -1,7 +1,7 @@
-#include <windows.h>
-extern "C" {
-_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-}  // force GPU use
+//#include <windows.h>
+//extern "C" {
+//_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+//}  // force GPU use
 
 #include "Eisen.h"
 
@@ -90,7 +90,10 @@ class my_app: public OpenGLApp {
     GLuint program;
 
     glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    Model ourModel;
+    //Model ourModel;
+    Mesh myMesh;
+    Renderer myRenderer;
+
     int start = 0;
     Timer t1;
 
@@ -161,8 +164,55 @@ public:
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        t1.start("Renderfunc");
-        ourModel.loadModel("../media/backpack/backpack.obj");
+        t1.start("Startup");
+        // ourModel.loadModel("../media/backpack/backpack.obj");
+        Texture myTex = loadMeshTexture("../media/wood.jpg", "diffuse");
+        float texFloat = (float)myTex.id;
+
+        vector<Vertex> myVertices;
+        Vertex a0;
+        a0.position = glm::vec3(-0.5f, -0.5f, 0.0f);
+        a0.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        a0.texPos = glm::vec2(0.0f, 0.0f);
+        a0.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        a0.texIndex = texFloat;
+
+        Vertex a1;
+        a1.position = glm::vec3(-0.5f, 0.5f, 0.0f);
+        a1.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        a1.texPos = glm::vec2(0.0f, 1.0f);
+        a1.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        a1.texIndex = texFloat;
+
+        Vertex a2;
+        a2.position = glm::vec3(0.5f, 0.5f, 0.0f);
+        a2.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        a2.texPos = glm::vec2(1.0f, 1.0f);
+        a2.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        a2.texIndex = texFloat;
+
+        Vertex a3;
+        a3.position = glm::vec3(0.5f, -0.5f, 0.0f);
+        a3.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        a3.texPos = glm::vec2(1.0f, 0.0f);
+        a3.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        a3.texIndex = texFloat;
+
+        myVertices.push_back(a0);
+        myVertices.push_back(a1);
+        myVertices.push_back(a2);
+        myVertices.push_back(a3);
+
+        vector<GLuint> myIndices = {0, 1, 2, 2, 3, 0};
+
+        myMesh.createMesh(myVertices, myIndices, myTex);
+
+        myRenderer.init();
+
+        glUseProgram(program);
+        int samplers[16];
+        for (int i = 0; i < 16; i++) { samplers[i] = i; }
+        setIntArray(program, "diffuse", 16, samplers);
     }
 
     void render(double currentTime) {
@@ -179,7 +229,12 @@ public:
         setMat4(program, "projection_matrix", projection);
         setMat4(program, "model_matrix", model);
 
-        ourModel.draw(program);
+        // ourModel.draw(program);
+        myRenderer.beginBatch();
+        myRenderer.draw(program, myMesh);
+
+        myRenderer.endBatch();
+        myRenderer.flush(program);
         if (start == 0) {
             t1.display();
             start = 1;

@@ -11,13 +11,13 @@ out vec2 pixelPos;
 
 void main()
 {
-	if (choice == 0)
+	if (choice == 0) //board
 		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.0, 1.0);
-	else if (choice == 1)
+	else if (choice == 1) //yellow paint
 		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.1, 1.0);
-	else if (choice == 2)
+	else if (choice == 2) //move previews
 		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.2, 1.0);
-	else if (choice == 3)
+	else if (choice == 3) // pieces
 		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.3, 1.0);
 
 	texPos = texIn;

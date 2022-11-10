@@ -18,5 +18,5 @@ namespace Eisen {
     void setVec4(GLuint program, std::string name, const glm::vec4& data);
     void setVec3(GLuint program, std::string name, float x, float y, float z);
     void setVec3(GLuint program, std::string name, const glm::vec3& data);
-    void setTexture(GLuint program, std::string name, int destination);
+    void setIntArray(GLuint program, std::string name, int size, int* data);
 }  // namespace Eisen
