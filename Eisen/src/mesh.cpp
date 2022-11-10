@@ -48,46 +48,8 @@ namespace Eisen {
 
         glBindVertexArray(vao);
 
-        Texture myTex = loadMeshTexture("../media/wood.jpg", "diffuse");
-        float texFloat = (float)myTex.id;
-        vector<Vertex> myVertices;
-        Vertex a0;
-        a0.position = glm::vec3(-0.5f, -0.5f, 0.0f);
-        a0.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a0.texPos = glm::vec2(0.0f, 0.0f);
-        a0.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a0.texIndex = texFloat;
-
-        Vertex a1;
-        a1.position = glm::vec3(-0.5f, 0.5f, 0.0f);
-        a1.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a1.texPos = glm::vec2(0.0f, 1.0f);
-        a1.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a1.texIndex = texFloat;
-
-        Vertex a2;
-        a2.position = glm::vec3(0.5f, 0.5f, 0.0f);
-        a2.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a2.texPos = glm::vec2(1.0f, 1.0f);
-        a2.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a2.texIndex = texFloat;
-
-        Vertex a3;
-        a3.position = glm::vec3(0.5f, -0.5f, 0.0f);
-        a3.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a3.texPos = glm::vec2(1.0f, 0.0f);
-        a3.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a3.texIndex = texFloat;
-
-        myVertices.push_back(a0);
-        myVertices.push_back(a1);
-        myVertices.push_back(a2);
-        myVertices.push_back(a3);
-
-        vector<GLuint> myIndices = {0, 1, 2, 2, 3, 0};
-
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, myVertices.size() * sizeof(Vertex), &myVertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 1000 * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
         glEnableVertexAttribArray(0);
@@ -104,8 +66,6 @@ namespace Eisen {
         glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texIndex));
         glEnableVertexAttribArray(4);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 10000 * sizeof(GLuint), &myIndices[0], GL_STATIC_DRAW);
 
         glBindVertexArray(0);
     }
@@ -149,8 +109,12 @@ namespace Eisen {
     }
 
     void Renderer::endBatch() {
-       /* glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), &vertices[0]);*/
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), &vertices[0]);
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
     }
 
     void Renderer::flush(GLuint& program) {
@@ -160,7 +124,7 @@ namespace Eisen {
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 

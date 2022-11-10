@@ -1,7 +1,7 @@
-//#include <windows.h>
-//extern "C" {
+// #include <windows.h>
+// extern "C" {
 //_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-//}  // force GPU use
+// }  // force GPU use
 
 #include "Eisen.h"
 
@@ -90,8 +90,9 @@ class my_app: public OpenGLApp {
     GLuint program;
 
     glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    //Model ourModel;
+    // Model ourModel;
     Mesh myMesh;
+    Mesh anotherMesh;
     Renderer myRenderer;
 
     int start = 0;
@@ -166,6 +167,7 @@ public:
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         t1.start("Startup");
         // ourModel.loadModel("../media/backpack/backpack.obj");
+
         Texture myTex = loadMeshTexture("../media/wood.jpg", "diffuse");
         float texFloat = (float)myTex.id;
 
@@ -207,6 +209,47 @@ public:
 
         myMesh.createMesh(myVertices, myIndices, myTex);
 
+        Texture anotherTex = loadMeshTexture("../media/smile.jpg", "diffuse");
+        float atexFloat = (float)anotherTex.id;
+
+        vector<Vertex> anotherVertices;
+        Vertex b0;
+        b0.position = glm::vec3(-0.5f, -0.5f, -1.0f);
+        b0.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        b0.texPos = glm::vec2(0.0f, 0.0f);
+        b0.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        b0.texIndex = atexFloat;
+
+        Vertex b1;
+        b1.position = glm::vec3(-0.5f, 0.5f, -1.0f);
+        b1.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        b1.texPos = glm::vec2(0.0f, 1.0f);
+        b1.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        b1.texIndex = atexFloat;
+
+        Vertex b2;
+        b2.position = glm::vec3(0.5f, 0.5f, -1.0f);
+        b2.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        b2.texPos = glm::vec2(1.0f, 1.0f);
+        b2.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        b2.texIndex = atexFloat;
+
+        Vertex b3;
+        b3.position = glm::vec3(0.5f, -0.5f, -1.0f);
+        b3.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+        b3.texPos = glm::vec2(1.0f, 0.0f);
+        b3.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        b3.texIndex = atexFloat;
+
+        anotherVertices.push_back(b0);
+        anotherVertices.push_back(b1);
+        anotherVertices.push_back(b2);
+        anotherVertices.push_back(b3);
+
+        vector<GLuint> anotherIndices = {0, 1, 2, 2, 3, 0};
+
+        anotherMesh.createMesh(anotherVertices, anotherIndices, anotherTex);
+
         myRenderer.init();
 
         glUseProgram(program);
@@ -232,6 +275,7 @@ public:
         // ourModel.draw(program);
         myRenderer.beginBatch();
         myRenderer.draw(program, myMesh);
+        myRenderer.draw(program, anotherMesh);
 
         myRenderer.endBatch();
         myRenderer.flush(program);

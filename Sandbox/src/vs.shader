@@ -18,5 +18,6 @@ void main() {
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
     vTexPos = aTexPos;
     vColor = aColor;
+    vTexIndex = aTexIndex;
     
 };

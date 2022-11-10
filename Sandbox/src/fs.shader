@@ -11,7 +11,7 @@ in float vTexIndex;
 uniform sampler2D diffuse[16];
 
 void main() {
-    //int index = int(vTexIndex);
-    //FragColor = texture(diffuse[index], vTexPos);
-    FragColor = vec4(1.0f);
+    int index = int(vTexIndex);
+    FragColor = texture(diffuse[index], vTexPos);
+    //FragColor = vec4(1.0f);
 };
