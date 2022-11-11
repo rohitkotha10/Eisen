@@ -28,19 +28,7 @@ namespace Eisen {
         GLuint id;
         string type;
         string path;
-    };
-
-    Texture loadMeshTexture(string path, string typeName);
-
-    class Mesh {
-    public:
-        vector<Vertex> vertices;
-        vector<GLuint> indices;
-        Texture texture;
-
-        void createMesh(vector<Vertex>& vertices, vector<GLuint>& indices, Texture& texture);
-    };
-
-    
-
+        void loadTexture(string path, string typeName);
+        void loadWhiteTexture();
+    }; 
 }  // namespace Eisen

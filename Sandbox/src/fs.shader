@@ -6,12 +6,25 @@ in vec2 vTexPos;
 in vec4 vColor;
 in float vTexIndex;
 
-// only 1 diffuse for each mesh
-// total 16 diffuse for batch
-uniform sampler2D diffuse[16];
+struct Material {
+    sampler2D diffuse; //active texture set to 1
+    sampler2D specular; //active texture set to 2
+};
+
+uniform int isQuad;
+
+uniform sampler2D whiteTexture;     // active texture for applying colors set to 0
+uniform sampler2D quadDiffuse[16];  // total 16 diffuse for batch
+
+uniform Material material;
 
 void main() {
-    int index = int(vTexIndex);
-    FragColor = texture(diffuse[index], vTexPos);
-    //FragColor = vec4(1.0f);
+    if (isQuad == 1) {
+        int index = int(vTexIndex);
+        FragColor = texture(quadDiffuse[index], vTexPos) * vColor;
+    } else {
+        FragColor = texture(material.diffuse, vTexPos);
+    }
+
+    // FragColor = vec4(1.0f);
 };

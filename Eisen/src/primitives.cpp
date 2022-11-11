@@ -1,12 +1,24 @@
-#include "mesh.h"
+#include "primitives.h"
 
 namespace Eisen {
 
-    Texture loadMeshTexture(string path, string typeName) {
-        Texture texture;
+    void Texture::loadWhiteTexture() {
+        glGenTextures(1, &(this->id));
+        glBindTexture(GL_TEXTURE_2D, this->id);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        uint32_t color = 0xffffffff;
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &color);
 
-        glGenTextures(1, &texture.id);
-        glBindTexture(GL_TEXTURE_2D, texture.id);
+        this->type = "white";
+        this->path = "nothing";
+    }
+
+    void Texture::loadTexture(string path, string typeName) {
+        glGenTextures(1, &(this->id));
+        glBindTexture(GL_TEXTURE_2D, this->id);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -30,14 +42,7 @@ namespace Eisen {
         }
         stbi_image_free(data);
 
-        texture.type = typeName;
-        texture.path = path;
-        return texture;
-    }
-
-    void Mesh::createMesh(vector<Vertex>& vertices, vector<GLuint>& indices, Texture& texture) {
-        this->vertices = vertices;
-        this->indices = indices;
-        this->texture = texture;
+        this->type = typeName;
+        this->path = path;
     }
 }  // namespace Eisen

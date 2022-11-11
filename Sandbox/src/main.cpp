@@ -91,9 +91,8 @@ class my_app: public OpenGLApp {
 
     glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
     Model ourModel;
-    Mesh myMesh;
-    Mesh anotherMesh;
-    Renderer myRenderer;
+    QuadRenderer myRenderer;
+    Texture tex;
 
     int start = 0;
     Timer t1;
@@ -166,96 +165,9 @@ public:
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         t1.start("Startup");
+        tex.loadTexture("../media/wood.jpg", "quadDiffuse");
         ourModel.loadModel("../media/backpack/backpack.obj");
-
-        Texture myTex = loadMeshTexture("../media/wood.jpg", "diffuse");
-        float texFloat = (float)myTex.id;
-
-        vector<Vertex> myVertices;
-        Vertex a0;
-        a0.position = glm::vec3(-0.5f, -0.5f, 0.0f);
-        a0.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a0.texPos = glm::vec2(0.0f, 0.0f);
-        a0.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a0.texIndex = texFloat;
-
-        Vertex a1;
-        a1.position = glm::vec3(-0.5f, 0.5f, 0.0f);
-        a1.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a1.texPos = glm::vec2(0.0f, 1.0f);
-        a1.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a1.texIndex = texFloat;
-
-        Vertex a2;
-        a2.position = glm::vec3(0.5f, 0.5f, 0.0f);
-        a2.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a2.texPos = glm::vec2(1.0f, 1.0f);
-        a2.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a2.texIndex = texFloat;
-
-        Vertex a3;
-        a3.position = glm::vec3(0.5f, -0.5f, 0.0f);
-        a3.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        a3.texPos = glm::vec2(1.0f, 0.0f);
-        a3.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        a3.texIndex = texFloat;
-
-        myVertices.push_back(a0);
-        myVertices.push_back(a1);
-        myVertices.push_back(a2);
-        myVertices.push_back(a3);
-
-        vector<GLuint> myIndices = {0, 1, 2, 2, 3, 0};
-
-        myMesh.createMesh(myVertices, myIndices, myTex);
-
-        Texture anotherTex = loadMeshTexture("../media/smile.jpg", "diffuse");
-        float atexFloat = (float)anotherTex.id;
-
-        vector<Vertex> anotherVertices;
-        Vertex b0;
-        b0.position = glm::vec3(-0.5f, -0.5f, -1.0f);
-        b0.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        b0.texPos = glm::vec2(0.0f, 0.0f);
-        b0.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        b0.texIndex = atexFloat;
-
-        Vertex b1;
-        b1.position = glm::vec3(-0.5f, 0.5f, -1.0f);
-        b1.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        b1.texPos = glm::vec2(0.0f, 1.0f);
-        b1.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        b1.texIndex = atexFloat;
-
-        Vertex b2;
-        b2.position = glm::vec3(0.5f, 0.5f, -1.0f);
-        b2.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        b2.texPos = glm::vec2(1.0f, 1.0f);
-        b2.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        b2.texIndex = atexFloat;
-
-        Vertex b3;
-        b3.position = glm::vec3(0.5f, -0.5f, -1.0f);
-        b3.normal = glm::vec3(0.0f, 0.0f, 1.0f);
-        b3.texPos = glm::vec2(1.0f, 0.0f);
-        b3.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        b3.texIndex = atexFloat;
-
-        anotherVertices.push_back(b0);
-        anotherVertices.push_back(b1);
-        anotherVertices.push_back(b2);
-        anotherVertices.push_back(b3);
-
-        vector<GLuint> anotherIndices = {0, 1, 2, 2, 3, 0};
-
-        anotherMesh.createMesh(anotherVertices, anotherIndices, anotherTex);
-
-        myRenderer.init();
-
-        glUseProgram(program);
-        int samplers[16];
-        for (int i = 0; i < 16; i++) { samplers[i] = i; }
-        setIntArray(program, "diffuse", 16, samplers);
+        myRenderer.init(1); //flickering for batch render as same shader changes continuously ig
     }
 
     void render(double currentTime) {
@@ -272,9 +184,25 @@ public:
         setMat4(program, "projection_matrix", projection);
         setMat4(program, "model_matrix", model);
 
-        //myRenderer.drawMesh(program, myMesh);
-        //myRenderer.drawMesh(program, anotherMesh);
-        myRenderer.drawModel(program, ourModel);
+        ourModel.draw(program);
+
+        myRenderer.beginBatch();
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                    myRenderer.drawQuadTexture(program, Quad(-1.0f + i * 0.1, -1.0f + j * 0.1, 0.05f), tex);
+
+            }
+        }
+
+        myRenderer.drawQuadColor(program, Quad(0.0f, 0.0f, 0.4f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        myRenderer.drawQuadTexture(program, Quad(0.5f, 0.0f, 0.4f), tex);
+        myRenderer.drawQuadTexture(program, Quad(1.0f, 0.0f, 0.4f), tex);
+
+
+        myRenderer.endBatch();
+        myRenderer.flush(program);
+
         if (start == 0) {
             t1.display();
             start = 1;
@@ -293,7 +221,10 @@ public:
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) cameraPos += cameraSpeed * cameraUp;
     }
 
-    void shutdown() { glDeleteProgram(program); }
+    void shutdown() {
+        glDeleteProgram(program);
+        ourModel.shutdown();
+    }
 };
 
 int main() {

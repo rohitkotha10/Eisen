@@ -2,7 +2,85 @@
 
 namespace Eisen {
 
+    void Mesh::createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures) {
+        this->vertices = vertices;
+        this->indices = indices;
+        this->textures = textures;
+
+        setupMesh();
+    }
+
+    void Mesh::setupMesh() {
+        glGenVertexArrays(1, &vao);
+        glGenBuffers(1, &vbo);
+        glGenBuffers(1, &ebo);
+
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texPos));
+        glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+        glEnableVertexAttribArray(3);
+
+        glBindVertexArray(0);
+    }
+
+    void Mesh::draw(GLuint& program) {
+        int numDiffuse = 0;
+        int numSpecular = 0;
+        for (unsigned int i = 0; i < textures.size(); i++) {
+            // tex0 is for white
+            // allowing only 1 diffuse and 1 specular map for model
+
+            string name = textures[i].type;
+            if (name == "diffuse") {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+                setInt(program, "material.diffuse", 0);
+                numDiffuse++;
+            } else if (name == "specular") {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+                setInt(program, "material.specular", 1);
+                numSpecular++;
+            } else {
+                cout << "Unknown texture type: " << textures[i].path << endl;
+            }
+        }
+        if (numSpecular > 1 || numDiffuse > 1) cout << "Only 1 diffuse and 1 specular supported!" << endl;
+        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(vao);
+        setInt(program, "isQuad", 0);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+    void Mesh::shutdown() {
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ebo);
+        for (int i = 0; i < textures.size(); i++) glDeleteTextures(1, &textures[i].id);
+    }
+
+    void Model::draw(GLuint& program) {
+        for (unsigned int i = 0; i < meshes.size(); i++) meshes[i].draw(program);
+    }
+
     void Model::loadModel(string path) {
+        this->whiteTex.loadWhiteTexture();
         Assimp::Importer import;
         const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -16,7 +94,6 @@ namespace Eisen {
     }
 
     void Model::processNode(aiNode* node, const aiScene* scene) {
-        
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             meshes.push_back(processMesh(mesh, scene));
@@ -29,21 +106,6 @@ namespace Eisen {
         vector<Vertex> vertices;
         vector<unsigned int> indices;
         vector<Texture> textures;
-
-        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
-            aiFace face = mesh->mFaces[i];
-            for (unsigned int j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
-        }
-
-        if (mesh->mMaterialIndex >= 0) {
-            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-            vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
-            vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
-
-            for (int i = 0; i < diffuseMaps.size(); i++) textures.push_back(diffuseMaps[i]);
-
-            for (int i = 0; i < specularMaps.size(); i++) textures.push_back(specularMaps[i]);
-        }
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             Vertex vertex;
@@ -68,15 +130,30 @@ namespace Eisen {
             } else
                 vertex.texPos = glm::vec2(0.0f, 0.0f);
 
-            vertex.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-            vertex.texIndex = textures[0].id;
-
             vertices.push_back(vertex);
         }
 
+        for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+            aiFace face = mesh->mFaces[i];
+            for (unsigned int j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
+        }
+
+        if (mesh->mMaterialIndex >= 0) {
+            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+            vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
+            vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
+
+            for (int i = 0; i < diffuseMaps.size(); i++) textures.push_back(diffuseMaps[i]);
+
+            for (int i = 0; i < specularMaps.size(); i++) textures.push_back(specularMaps[i]);
+        }
         Mesh temp;
-        temp.createMesh(vertices, indices, textures[0]);
+        temp.createMesh(vertices, indices, textures);
         return temp;
+    }
+
+    void Model::shutdown() {
+        for (int i = 0; i < meshes.size(); i++) { meshes[i].shutdown(); }
     }
 
     vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName) {
@@ -98,34 +175,7 @@ namespace Eisen {
             }
             if (!skip) {  // if texture hasn't been loaded already, load it
                 Texture texture;
-
-                glGenTextures(1, &texture.id);
-                glBindTexture(GL_TEXTURE_2D, texture.id);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                stbi_set_flip_vertically_on_load(true);
-                int width, height, nrChannels;
-                unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-                if (data) {
-                    GLenum format = 3;
-                    if (nrChannels == 1)
-                        format = GL_RED;
-                    else if (nrChannels == 3)
-                        format = GL_RGB;
-                    else if (nrChannels == 4)
-                        format = GL_RGBA;
-                    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-                    glGenerateMipmap(GL_TEXTURE_2D);
-                } else {
-                    std::cout << "Failed to load texture: " << filename << std::endl;
-                }
-                stbi_image_free(data);
-
-                texture.type = typeName;
-                texture.path = filename;
+                texture.loadTexture(filename, typeName);
                 textures_loaded.push_back(texture);  // add to loaded textures
                 textures.push_back(texture);
             }

@@ -1,25 +1,46 @@
 #pragma once
+#include "primitives.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "mesh.h"
-
-using namespace std;
-
 namespace Eisen {
+
+    class Mesh {
+    public:
+        vector<Vertex> vertices;
+        vector<GLuint> indices;
+        vector<Texture> textures;
+
+        void createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
+        void draw(GLuint& program);
+        void shutdown();
+
+    private:
+        GLuint vao;
+        GLuint vbo;
+        GLuint ebo;
+
+        void setupMesh();
+    };
+
     class Model {
     public:
         void loadModel(string path);
-        vector<Mesh> meshes;
+        void draw(GLuint& program);
+        void shutdown();
 
     private:
+        vector<Mesh> meshes;
         string directory;
         vector<Texture> textures_loaded;
 
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
         vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+
+        Texture whiteTex; //for colors
     };
 
 }  // namespace Eisen

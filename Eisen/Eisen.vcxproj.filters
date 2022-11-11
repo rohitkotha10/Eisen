@@ -24,16 +24,16 @@
     <ClInclude Include="src\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\renderer.h">
+    <ClInclude Include="src\quadrenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\primitives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,9 +47,6 @@
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,7 +56,10 @@
     <ClCompile Include="vendor\stb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\renderer.cpp">
+    <ClCompile Include="src\quadrenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\primitives.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
