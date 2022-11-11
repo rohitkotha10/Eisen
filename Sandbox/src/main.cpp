@@ -1,7 +1,7 @@
-// #include <windows.h>
-// extern "C" {
-//_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-// }  // force GPU use
+ #include <windows.h>
+ extern "C" {
+_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+ }  // force GPU use
 
 #include "Eisen.h"
 
@@ -165,7 +165,7 @@ public:
 
         t1.start("Startup");
 
-        ourModel.loadModel("../media/backpack/backpack.obj");
+        ourModel.loadModel("../media/box/box.obj");
     }
 
     void render(double currentTime) {
