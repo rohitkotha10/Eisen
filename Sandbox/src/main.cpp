@@ -90,7 +90,7 @@ class my_app: public OpenGLApp {
     GLuint program;
 
     glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    // Model ourModel;
+    Model ourModel;
     Mesh myMesh;
     Mesh anotherMesh;
     Renderer myRenderer;
@@ -166,7 +166,7 @@ public:
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         t1.start("Startup");
-        // ourModel.loadModel("../media/backpack/backpack.obj");
+        ourModel.loadModel("../media/backpack/backpack.obj");
 
         Texture myTex = loadMeshTexture("../media/wood.jpg", "diffuse");
         float texFloat = (float)myTex.id;
@@ -272,13 +272,9 @@ public:
         setMat4(program, "projection_matrix", projection);
         setMat4(program, "model_matrix", model);
 
-        // ourModel.draw(program);
-        myRenderer.beginBatch();
-        myRenderer.draw(program, myMesh);
-        myRenderer.draw(program, anotherMesh);
-
-        myRenderer.endBatch();
-        myRenderer.flush(program);
+        //myRenderer.drawMesh(program, myMesh);
+        //myRenderer.drawMesh(program, anotherMesh);
+        myRenderer.drawModel(program, ourModel);
         if (start == 0) {
             t1.display();
             start = 1;

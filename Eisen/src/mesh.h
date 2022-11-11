@@ -41,23 +41,6 @@ namespace Eisen {
         void createMesh(vector<Vertex>& vertices, vector<GLuint>& indices, Texture& texture);
     };
 
-    class Renderer {
-    public:
-        void init();
-        void beginBatch();
-        void endBatch();
-        void flush(GLuint& program);
-        void draw(GLuint& program, Mesh& mesh);
-        void shutdown();
-
-    private:
-        GLuint vao;
-        GLuint vbo;
-        GLuint ebo;
-
-        vector<Vertex> vertices;
-        vector<GLuint> indices;
-        vector<Texture> textures;
-    };
+    
 
 }  // namespace Eisen
