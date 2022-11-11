@@ -13,7 +13,7 @@ namespace Eisen {
         vector<GLuint> indices;
         vector<Texture> textures;
 
-        void createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
+        void createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, glm::vec4 color);
         void draw(GLuint& program);
         void shutdown();
 
@@ -22,6 +22,7 @@ namespace Eisen {
         GLuint vbo;
         GLuint ebo;
 
+        glm::vec4 color;
         void setupMesh();
     };
 
@@ -39,8 +40,7 @@ namespace Eisen {
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
         vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
-
-        Texture whiteTex; //for colors
+        glm::vec4 loadColor(aiMaterial* mat);
     };
 
 }  // namespace Eisen

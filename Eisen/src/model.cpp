@@ -2,10 +2,11 @@
 
 namespace Eisen {
 
-    void Mesh::createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures) {
+    void Mesh::createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, glm::vec4 color) {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+        this->color = color;
 
         setupMesh();
     }
@@ -42,16 +43,15 @@ namespace Eisen {
         int numDiffuse = 0;
         int numSpecular = 0;
         for (unsigned int i = 0; i < textures.size(); i++) {
-            // tex0 is for white
             // allowing only 1 diffuse and 1 specular map for model
 
             string name = textures[i].type;
-            if (name == "diffuse") {
+            if (name == "diffuse" && numDiffuse <= 1) {
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
                 setInt(program, "material.diffuse", 0);
                 numDiffuse++;
-            } else if (name == "specular") {
+            } else if (name == "specular" && numSpecular <= 1) {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
                 setInt(program, "material.specular", 1);
@@ -61,8 +61,16 @@ namespace Eisen {
             }
         }
         if (numSpecular > 1 || numDiffuse > 1) cout << "Only 1 diffuse and 1 specular supported!" << endl;
+
+        if (numDiffuse == 0)
+            setInt(program, "material.hasTexture", 0);
+        else
+            setInt(program, "material.hasTexture", 1);
+
         glActiveTexture(GL_TEXTURE0);
+
         glBindVertexArray(vao);
+        setVec4(program, "material.color", this->color);
         setInt(program, "isQuad", 0);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
@@ -80,7 +88,6 @@ namespace Eisen {
     }
 
     void Model::loadModel(string path) {
-        this->whiteTex.loadWhiteTexture();
         Assimp::Importer import;
         const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -106,6 +113,18 @@ namespace Eisen {
         vector<Vertex> vertices;
         vector<unsigned int> indices;
         vector<Texture> textures;
+        glm::vec4 color;
+
+        if (mesh->mMaterialIndex >= 0) {
+            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+            vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
+            vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
+            color = loadColor(material);
+
+            for (int i = 0; i < diffuseMaps.size(); i++) textures.push_back(diffuseMaps[i]);
+
+            for (int i = 0; i < specularMaps.size(); i++) textures.push_back(specularMaps[i]);
+        }
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
             Vertex vertex;
@@ -120,6 +139,8 @@ namespace Eisen {
             vector.y = mesh->mNormals[i].y;
             vector.z = mesh->mNormals[i].z;
             vertex.normal = vector;
+
+            vertex.color = color;
 
             if (mesh->mTextureCoords[0])  // does the mesh contain texture coordinates?
             {
@@ -138,17 +159,8 @@ namespace Eisen {
             for (unsigned int j = 0; j < face.mNumIndices; j++) indices.push_back(face.mIndices[j]);
         }
 
-        if (mesh->mMaterialIndex >= 0) {
-            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-            vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
-            vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
-
-            for (int i = 0; i < diffuseMaps.size(); i++) textures.push_back(diffuseMaps[i]);
-
-            for (int i = 0; i < specularMaps.size(); i++) textures.push_back(specularMaps[i]);
-        }
         Mesh temp;
-        temp.createMesh(vertices, indices, textures);
+        temp.createMesh(vertices, indices, textures, color);
         return temp;
     }
 
@@ -181,5 +193,11 @@ namespace Eisen {
             }
         }
         return textures;
+    }
+
+    glm::vec4 Model::loadColor(aiMaterial* mat) {
+        aiColor3D color(0.f, 0.f, 0.f);
+        mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+        return glm::vec4(color.r, color.g, color.b, 1.0f);
     }
 }  // namespace Eisen

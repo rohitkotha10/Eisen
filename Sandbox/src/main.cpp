@@ -91,8 +91,6 @@ class my_app: public OpenGLApp {
 
     glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
     Model ourModel;
-    QuadRenderer myRenderer;
-    Texture tex;
 
     int start = 0;
     Timer t1;
@@ -164,10 +162,10 @@ public:
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         t1.start("Startup");
-        tex.loadTexture("../media/wood.jpg", "quadDiffuse");
+
         ourModel.loadModel("../media/backpack/backpack.obj");
-        myRenderer.init(1); //flickering for batch render as same shader changes continuously ig
     }
 
     void render(double currentTime) {
@@ -185,23 +183,6 @@ public:
         setMat4(program, "model_matrix", model);
 
         ourModel.draw(program);
-
-        myRenderer.beginBatch();
-
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                    myRenderer.drawQuadTexture(program, Quad(-1.0f + i * 0.1, -1.0f + j * 0.1, 0.05f), tex);
-
-            }
-        }
-
-        myRenderer.drawQuadColor(program, Quad(0.0f, 0.0f, 0.4f), glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-        myRenderer.drawQuadTexture(program, Quad(0.5f, 0.0f, 0.4f), tex);
-        myRenderer.drawQuadTexture(program, Quad(1.0f, 0.0f, 0.4f), tex);
-
-
-        myRenderer.endBatch();
-        myRenderer.flush(program);
 
         if (start == 0) {
             t1.display();
