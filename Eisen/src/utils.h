@@ -2,16 +2,15 @@
 #include <chrono>
 #include <string>
 
-using namespace std;
 namespace Eisen {
     class Timer {
     public:
-        void start(string name);
+        void start(std::string name);
         void display();
 
     private:
-        chrono::steady_clock::time_point startTime;
-        chrono::steady_clock::time_point curTime;
-        string name;
+        std::chrono::steady_clock::time_point startTime;
+        std::chrono::steady_clock::time_point curTime;
+        std::string name;
     };
 }  // namespace Eisen

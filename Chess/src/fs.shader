@@ -2,38 +2,31 @@
 
 out vec4 FragColor;
 
-in vec2 texPos;
-in vec2 pixelPos;
+in vec2 vTexPos;
+in vec4 vColor;
+in float vTexIndex;
 
-uniform sampler2D tex;
-uniform vec4 color;
-uniform int outChoice;
-uniform int occupy;
+struct Model {
+    sampler2D diffuse;   // active texture set to 0
+    sampler2D specular;  // active texture set to 1
+    vec4 color;
+    int hasTexture;
+};
 
-void main()
-{
-	if (outChoice == 0 || outChoice == 1) //for board(0) and yellow(1)
-		FragColor = color;
-	else if (outChoice == 2) //move previews
-	{
-		float distance = length(pixelPos);
-		if (occupy == 0) //no one here, can move
-		{
-			if (distance < 0.3f) //solid small circle
-				FragColor = vec4(0.0f, 0.0f, 0.0f, 0.1f);
-			else
-				FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		}
+uniform int isQuad;
 
-		else if (occupy == 2) //2 for enemy, 1 for comrade
-		{
-			if (distance > 0.8f && distance < 0.95f) //hollow big circle
-				FragColor = vec4(0.0f, 0.0f, 0.0f, 0.1f);
-			else
-				FragColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		}
+uniform sampler2D quadDiffuse[16];  // total 16 diffuse for batch 2 to 17 active
 
-	}
-	else if (outChoice == 3) //piece 
-		FragColor = texture(tex, texPos);
+uniform Model material;
+
+void main() {
+    if (isQuad == 1) {
+        int index = int(vTexIndex);
+        FragColor = texture(quadDiffuse[index], vTexPos) * vColor;
+    } else {
+        if (material.hasTexture == 0)
+            FragColor = material.color;  // diffuse set to whiteTex if no map
+        else
+            FragColor = texture(material.diffuse, vTexPos);
+    }
 };

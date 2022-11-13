@@ -13,8 +13,6 @@
 
 #include "shader.h"
 
-using namespace std;
-
 namespace Eisen {
     struct Vertex {
         glm::vec3 position;
@@ -26,9 +24,9 @@ namespace Eisen {
 
     struct Texture {
         GLuint id;
-        string type;
-        string path;
-        void loadTexture(string path, string typeName);
+        std::string type;
+        std::string path;
+        void loadTexture(std::string path, std::string typeName);
         void loadWhiteTexture();
-    }; 
+    };
 }  // namespace Eisen

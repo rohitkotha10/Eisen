@@ -1,9 +1,22 @@
 #version 450 core
 
-layout(location = 0) in vec2 aPos;
-uniform mat4 mvp_matrix;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 aTexPos;
+layout(location = 3) in vec4 aColor;
+layout(location = 4) in float aTexIndex;  // for batch render
 
-void main()
-{
-	gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.1f, 1.0f);
+out vec2 vTexPos;
+out vec4 vColor;
+out float vTexIndex;
+
+uniform mat4 model_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
+void main() {
+    gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
+    vTexPos = aTexPos;
+    vColor = aColor;
+    vTexIndex = aTexIndex;
 };

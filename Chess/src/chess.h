@@ -4,41 +4,49 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
-
 bool isWhite(char piece);
-string placeToString(int place);
-int placeToInt(string place);
+std::string placeToString(int place);
+int placeToInt(std::string place);
+std::string getPointer(int xpos, int ypos, int scrw, int scrh);  // for mouse picking
 
 class ChessTable {
 public:
     ChessTable();
-    void set(string place, char piece);   // dead or alive at position
-    char positonStatus(string positon);  // empty or piece occupying
+    void set(std::string place, char piece);  // dead or alive at position
+    char positonStatus(std::string positon);  // empty or piece occupying
 
 private:
-    vector<char> arr;
+    std::vector<char> arr;
 };
 
 class MyGame {
 public:
-    void importFEN(string fen);
-    string getFEN();
-    string getNotation();
-    void setPosition(string place, char piece);
-    char getPositonStatus(string positon);
+    void importFEN(std::string fen);
+    std::string getFEN();
+    std::string getNotation();
+    void setPosition(std::string place, char piece);
+    char getPositonStatus(std::string positon);
     char getTurn() { return turn; };
-    char getFullMoves() { return fullMoves; };
-    int processMove(string move);  // update table and notation here
+    int getFullMoves() { return fullMoves; };
+    int processMove(std::string fir, std::string sec);  // update table and notation here
 
 private:
-    char turn;         // w or b
-    string castling;   // KQkq
-    string enPessant;  // square right before advance
+    char turn;              // w or b
+    std::string castling;   // KQkq
+    std::string enPessant;  // square right before advance
     int halfMoves;
     int fullMoves;
     bool check;
     bool checkMate;
-    vector<string> moves;
+    std::vector<std::string> moves;
     ChessTable chessTable;
+
+    std::vector<std::pair<std::string, int>> getPieceMoves(std::string place, char piece);
+    std::vector<std::pair<std::string, int>> getPawnMoves(std::string place);
+    std::vector<std::pair<std::string, int>> getRookMoves(std::string place);
+    std::vector<std::pair<std::string, int>> getKnightMoves(std::string place);
+    std::vector<std::pair<std::string, int>> getBishopMoves(std::string place);
+    std::vector<std::pair<std::string, int>> getQueenMoves(std::string place);
+    std::vector<std::pair<std::string, int>> getKingMoves(std::string place);
+
 };

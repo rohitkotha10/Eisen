@@ -1,5 +1,7 @@
 #include "primitives.h"
 
+using namespace std;
+
 namespace Eisen {
 
     void Texture::loadWhiteTexture() {

@@ -14,13 +14,6 @@ int screen_height = 800;
 float screen_aspect = (float)screen_width / (float)screen_height;
 float fov = 45.0f;
 
-glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 cameraFront = glm::normalize(cameraTarget - cameraPos);          // also facing the scene
-glm::vec3 cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));  // camera is in left hand system
-glm::vec3 cameraUp = glm::normalize(glm::cross(cameraFront, cameraRight));
-
 int getCnt(int i, int j, vector<vector<char>> arr, int n, int m) {
     if (i >= n || j >= m) return -1;
 
@@ -68,27 +61,27 @@ void keyboard_callback(GLFWwindow* window, int key, int scancode, int action, in
 
 class my_app: public OpenGLApp {
     GLuint program;
-    GLuint vao;
-    GLuint vertBuffer;
-    GLuint indBuffer;
+    QuadRenderer myRenderer;
+
     vector<vector<char>> curConway;
     float startTime;
 
 public:
     void init() {
-        info.width = 800;
-        info.height = 800;
+        info.width = screen_width;
+        info.height = screen_height;
         info.MajorVersion = 4;
         info.MinorVersion = 5;
         info.title = "Conway Game of Life";
         info.color = new float[4] {0.0f, 0.0f, 0.0f, 0.0f};
         info.fullscreen = false;
+        info.resize = false;
     }
 
     void shaderCompile() {
         // vertex shader
         GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        std::string trial = parse("src/vs.shader");
+        string trial = parse("src/vs.shader");
         const GLchar* vsSource = trial.c_str();
         glShaderSource(vs, 1, &vsSource, NULL);
         glCompileShader(vs);
@@ -98,7 +91,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(vs, 512, NULL, infoLog);
-            std::cout << "Vertex Shader Error\n" << infoLog << std::endl;
+            cout << "Vertex Shader Error\n" << infoLog << endl;
         }
 
         // frag shader
@@ -113,7 +106,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(fs, 512, NULL, infoLog);
-            std::cout << "Frag Shader Error\n" << infoLog << std::endl;
+            cout << "Frag Shader Error\n" << infoLog << endl;
         }
 
         program = glCreateProgram();
@@ -126,7 +119,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetProgramInfoLog(program, 512, NULL, infoLog);
-            std::cout << "Shader Linking Error\n" << infoLog << std::endl;
+            cout << "Shader Linking Error\n" << infoLog << endl;
         }
 
         glDeleteShader(vs);
@@ -137,22 +130,7 @@ public:
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         glfwSetKeyCallback(window, keyboard_callback);
 
-        static const GLfloat vertices[] = {1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f};
-        static const int indices[] = {0, 1, 3, 1, 2, 3};
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vertBuffer);
-        glGenBuffers(1, &indBuffer);
-
-        glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+        myRenderer.init(100);
 
         int n = 50;
         int m = 50;
@@ -178,53 +156,42 @@ public:
 
     void render(double currentTime) {
         glUseProgram(program);
-        glBindVertexArray(vao);
-        int time = 0;
-        setMat4(program, "trans_matrix", glm::mat4(1.0f));
-        setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        myRenderer.beginBatch();
 
         glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 100.0f);
+        setMat4(program, "view_matrix", view);
+        setMat4(program, "projection_matrix", projection);
+        setMat4(program, "model_matrix", model);
 
         int n = (int)curConway.size();
         int m = (int)curConway[0].size();
 
-        float scale = 1.0f / max(n, m);
-        float incr = scale;
-        //curConway = conway_life(curConway, n, m);
-
         float stepTime = 1;
-        if (currentTime > startTime)
-        {
-                curConway = conway_life(curConway, n, m);
-                startTime += stepTime;
+        if (currentTime > startTime) {
+            curConway = conway_life(curConway, n, m);
+            startTime += stepTime;
         }
+        // curConway = conway_life(curConway, n, m);
+        float side = 2.0f / n;
 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 if (curConway[i][j] == '1') {
-                    float xshift = -1.0f + (2 * j + 1) * incr;
-                    float yshift = 1.0f - (2 * i + 1) * incr;
-                    model = glm::translate(glm::mat4(1.0f), glm::vec3(xshift, yshift, 0.0f));
-                    model = glm::scale(model, glm::vec3(scale));
-
-                    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
-                    glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
-                    glm::mat4 mvp = projection * view * model;
-
-                    setMat4(program, "mvp_matrix", mvp);
-                    setVec3(program, "color", glm::vec3(1.0f, 1.0f, 1.0f));
-                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                    myRenderer.drawQuadColor(program, Quad(-1.0f + i * side, -1.0f + j * side, side), glm::vec4(1.0f));
                 }
             }
         }
+
+        myRenderer.endBatch();
+        myRenderer.flush(program);
     }
 
     void shutdown() {
         glDeleteProgram(program);
-        glDeleteBuffers(1, &vertBuffer);
-        glDeleteBuffers(1, &indBuffer);
-        glDeleteVertexArrays(1, &vao);
+        myRenderer.shutdown();
     }
 };
 

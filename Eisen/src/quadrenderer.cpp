@@ -1,5 +1,7 @@
 #include "quadrenderer.h"
 
+using namespace std;
+
 namespace Eisen {
 
     Quad::Quad(float x, float y, float size) {

@@ -1,25 +1,22 @@
 #version 450 core
 
-layout(location = 0) in vec2 aPos;
-layout(location = 1) in vec2 texIn;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec2 aTexPos;
+layout(location = 3) in vec4 aColor;
+layout(location = 4) in float aTexIndex;  // for batch render
 
-uniform mat4 mvp_matrix;
-uniform int choice;
+out vec2 vTexPos;
+out vec4 vColor;
+out float vTexIndex;
 
-out vec2 texPos;
-out vec2 pixelPos;
+uniform mat4 model_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
 
-void main()
-{
-	if (choice == 0) //board
-		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.0, 1.0);
-	else if (choice == 1) //yellow paint
-		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.1, 1.0);
-	else if (choice == 2) //move previews
-		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.2, 1.0);
-	else if (choice == 3) // pieces
-		gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.3, 1.0);
-
-	texPos = texIn;
-	pixelPos = aPos;
+void main() {
+    gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
+    vTexPos = aTexPos;
+    vColor = aColor;
+    vTexIndex = aTexIndex;
 };

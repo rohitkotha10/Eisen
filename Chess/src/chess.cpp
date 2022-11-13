@@ -19,10 +19,27 @@ int placeToInt(string place) {
     return rank + 8 * (file - 1);
 }
 
+string getPointer(int xpos, int ypos, int scrw, int scrh)  // for mouse picking
+{
+    float temp = (float)xpos / ((float)scrw / 10.0f);
+    int file = temp;
+
+    temp = (float)ypos / ((float)scrw / 10.0f);
+    int rank = 10 - temp;
+
+    if (rank < 1 || file < 1 || rank > 8 || file > 8) {
+        cout << "Invalid Select";
+        return "BAD";
+    }
+
+    return placeToString(rank + 8 * (file - 1));
+}
+
 ChessTable::ChessTable() {
     arr.resize(65);
     for (int i = 1; i <= 64; i++) { arr[i] = 'e'; }
 }
+
 void ChessTable::set(string place, char piece) {
     int cur = placeToInt(place);
     arr[cur] = piece;
@@ -122,7 +139,7 @@ void MyGame::importFEN(string fen) {
 string MyGame::getFEN() {
     string fen;
     char temp = 0;
-    for (int rank = 8; rank >= 0; rank++) {
+    for (int rank = 8; rank >= 0; rank--) {
         for (int file = 1; file <= 8; file++) {
             string cur = placeToString(rank + 8 * (file - 1));
             char piece = getPositonStatus(cur);
@@ -154,12 +171,48 @@ string MyGame::getFEN() {
     return fen;
 }
 
-int MyGame::processMove(string move) {
+string MyGame::getNotation() {
+    return "nothing";
+}
+
+vector<pair<string, int>> MyGame::getPawnMoves(string place) {
+}
+vector<pair<string, int>> MyGame::getRookMoves(string place) {
+}
+vector<pair<string, int>> MyGame::getKnightMoves(string place) {
+}
+vector<pair<string, int>> MyGame::getBishopMoves(string place) {
+}
+vector<pair<string, int>> MyGame::getQueenMoves(string place) {
+}
+vector<pair<string, int>> MyGame::getKingMoves(string place) {
+}
+
+vector<pair<string, int>> MyGame::getPieceMoves(string place, char piece) {
+    if (piece == 'p' || piece == 'P') return getPawnMoves(place);
+    if (piece == 'r' || piece == 'R') return getRookMoves(place);
+    if (piece == 'n' || piece == 'N') return getKnightMoves(place);
+    if (piece == 'b' || piece == 'B') return getBishopMoves(place);
+    if (piece == 'q' || piece == 'Q') return getQueenMoves(place);
+    if (piece == 'k' || piece == 'K') return getKingMoves(place);
+}
+int MyGame::processMove(string fir, string sec) {
     // 0 process move
     // 1 game over show winner
     // 2 draw
     // -1 reject move
-    char piece;
+    if (fir == "BAD" || sec == "BAD") return -1;
+    char piece = getPositonStatus(fir);
     bool color = isWhite(piece);
-    if ((color == true && turn == 'b') || (color == false && turn == 'w')) return -1;
+    if ((color == true && turn == 'b') || (color == false && turn == 'w') || piece == 'e') return -1;
+    vector<pair<string, int>> nextMoves = getPieceMoves(fir, piece);
+
+    for (auto i: nextMoves) {
+        if (i.first == sec) {
+            if (i.second == 0) //comrade
+                return -1;
+            else {}
+        }
+    }
+    return -1;
 }

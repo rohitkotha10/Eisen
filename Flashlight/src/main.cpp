@@ -133,7 +133,7 @@ public:
     void shaderCompile() {
         // vertex shader
         GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        std::string trial = parse("src/vs.shader");
+        string trial = parse("src/vs.shader");
         const GLchar* vsSource = trial.c_str();
         glShaderSource(vs, 1, &vsSource, NULL);
         glCompileShader(vs);
@@ -143,7 +143,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(vs, 512, NULL, infoLog);
-            std::cout << "Vertex Shader Error\n" << infoLog << std::endl;
+            cout << "Vertex Shader Error\n" << infoLog << endl;
         }
 
         // frag shader
@@ -158,7 +158,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(fs, 512, NULL, infoLog);
-            std::cout << "Frag Shader Error\n" << infoLog << std::endl;
+            cout << "Frag Shader Error\n" << infoLog << endl;
         }
 
         program = glCreateProgram();
@@ -171,7 +171,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetProgramInfoLog(program, 512, NULL, infoLog);
-            std::cout << "Shader Linking Error\n" << infoLog << std::endl;
+            cout << "Shader Linking Error\n" << infoLog << endl;
         }
 
         glDeleteShader(vs);
@@ -245,7 +245,7 @@ public:
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
-            std::cout << "Failed to load texture" << std::endl;
+            cout << "Failed to load texture" << endl;
         }
         stbi_image_free(data);
 
@@ -261,7 +261,7 @@ public:
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
-            std::cout << "Failed to load texture" << std::endl;
+            cout << "Failed to load texture" << endl;
         }
         stbi_image_free(data);
     }

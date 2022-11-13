@@ -1,7 +1,7 @@
- #include <windows.h>
- extern "C" {
+#include <windows.h>
+extern "C" {
 _declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
- }  // force GPU use
+}  // force GPU use
 
 #include "Eisen.h"
 
@@ -110,7 +110,7 @@ public:
     void shaderCompile() {
         // vertex shader
         GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        std::string trial = parse("src/vs.shader");
+        string trial = parse("src/vs.shader");
         const GLchar* vsSource = trial.c_str();
         glShaderSource(vs, 1, &vsSource, NULL);
         glCompileShader(vs);
@@ -120,7 +120,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(vs, 512, NULL, infoLog);
-            std::cout << "Vertex Shader Error\n" << infoLog << std::endl;
+            cout << "Vertex Shader Error\n" << infoLog << endl;
         }
 
         // frag shader
@@ -135,7 +135,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(fs, 512, NULL, infoLog);
-            std::cout << "Frag Shader Error\n" << infoLog << std::endl;
+            cout << "Frag Shader Error\n" << infoLog << endl;
         }
 
         program = glCreateProgram();
@@ -148,7 +148,7 @@ public:
         if (!success) {
             char infoLog[512];
             glGetProgramInfoLog(program, 512, NULL, infoLog);
-            std::cout << "Shader Linking Error\n" << infoLog << std::endl;
+            cout << "Shader Linking Error\n" << infoLog << endl;
         }
 
         glDeleteShader(vs);
@@ -165,7 +165,7 @@ public:
 
         t1.start("Startup");
 
-        ourModel.loadModel("../media/box/box.obj");
+        ourModel.loadModel("../media/backpack/backpack.obj");
     }
 
     void render(double currentTime) {

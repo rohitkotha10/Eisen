@@ -9,11 +9,12 @@ namespace Eisen {
 
     class Mesh {
     public:
-        vector<Vertex> vertices;
-        vector<GLuint> indices;
-        vector<Texture> textures;
+        std::vector<Vertex> vertices;
+        std::vector<GLuint> indices;
+        std::vector<Texture> textures;
 
-        void createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, glm::vec4 color);
+        void createMesh(
+            std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures, glm::vec4 color);
         void draw(GLuint& program);
         void shutdown();
 
@@ -28,18 +29,18 @@ namespace Eisen {
 
     class Model {
     public:
-        void loadModel(string path);
+        void loadModel(std::string path);
         void draw(GLuint& program);
         void shutdown();
 
     private:
-        vector<Mesh> meshes;
-        string directory;
-        vector<Texture> textures_loaded;
+        std::vector<Mesh> meshes;
+        std::string directory;
+        std::vector<Texture> textures_loaded;
 
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-        vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+        std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         glm::vec4 loadColor(aiMaterial* mat);
     };
 

@@ -1,5 +1,7 @@
 #include "model.h"
 
+using namespace std;
+
 namespace Eisen {
 
     void Mesh::createMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, glm::vec4 color) {
