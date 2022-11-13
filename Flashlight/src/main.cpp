@@ -303,7 +303,7 @@ public:
         glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
         setMat4(program, "view_matrix", view);
         setMat4(program, "projection_matrix", projection);
-        setBool(program, "isFlash", isFlash);
+        setInt(program, "isFlash", isFlash);
         for (int i = 0; i < 10; i++) {
             glm::mat4 model = glm::translate(glm::mat4(1.0f), cubePositions[i]);
             float angle = 20.0f * i;

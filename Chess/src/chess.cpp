@@ -739,6 +739,20 @@ int MyGame::processMove(string fir, string sec) {
                 chessTable.set(sec, piece);
                 chessTable.set(fir, 'e');
 
+                if (sec == enPessant) {
+                    cout << "HERE" << endl;
+                    int temp = placeToInt(sec);
+                    int r = ((placeToInt(sec) - 1) % 8) + 1;
+                    int f = ((placeToInt(sec) - 1) / 8) + 1;
+
+                    string ep;
+                    if (turn == 'w')
+                        ep = placeToString((r - 1) + 8 * (f - 1));
+                    else
+                        ep = placeToString((r + 1) + 8 * (f - 1));
+                    chessTable.set(ep, 'e');
+                }
+
                 if (turn == 'w')
                     turn = 'b';
                 else {
@@ -758,6 +772,10 @@ int MyGame::processMove(string fir, string sec) {
                         enPessant = placeToString((rank1 + 1) + 8 * (file1 - 1));
                     else if ((rank1 - rank2) == 2)
                         enPessant = placeToString((rank1 - 1) + 8 * (file1 - 1));
+                    else
+                        enPessant = "-";
+                } else {
+                    enPessant = "-";
                 }
 
                 // castling check
