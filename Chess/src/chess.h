@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-bool isWhite(char piece);
+char getColor(char piece);
 std::string placeToString(int place);
 int placeToInt(std::string place);
 std::string getPointer(int xpos, int ypos, int scrw, int scrh);  // for mouse picking
@@ -28,6 +28,7 @@ public:
     char getPositonStatus(std::string positon);
     char getTurn() { return turn; };
     int getFullMoves() { return fullMoves; };
+    std::vector<std::pair<std::string, int>> getPieceMoves(std::string place);
     int processMove(std::string fir, std::string sec);  // update table and notation here
 
 private:
@@ -37,16 +38,13 @@ private:
     int halfMoves;
     int fullMoves;
     bool check;
-    bool checkMate;
     std::vector<std::string> moves;
     ChessTable chessTable;
 
-    std::vector<std::pair<std::string, int>> getPieceMoves(std::string place, char piece);
     std::vector<std::pair<std::string, int>> getPawnMoves(std::string place);
     std::vector<std::pair<std::string, int>> getRookMoves(std::string place);
     std::vector<std::pair<std::string, int>> getKnightMoves(std::string place);
     std::vector<std::pair<std::string, int>> getBishopMoves(std::string place);
     std::vector<std::pair<std::string, int>> getQueenMoves(std::string place);
     std::vector<std::pair<std::string, int>> getKingMoves(std::string place);
-
 };

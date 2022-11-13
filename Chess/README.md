@@ -2,8 +2,8 @@
 Chess Game.
 
 ## Ideas and Tasks
-- piece movement logic
 - check and checkmate logic
+- notation
+- castling
 - chess engine integration
-- move history tracking controls
 - animation for pieces movement

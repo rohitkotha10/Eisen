@@ -2,13 +2,17 @@
 
 using namespace std;
 
-bool isWhite(char piece) {
-    if (piece == 'P' || piece == 'R' || piece == 'N' || piece == 'B' || piece == 'Q' || piece == 'K') return true;
+char getColor(char piece) {
+    if (piece == 'e') return 'e';
+    if (piece == 'P' || piece == 'R' || piece == 'N' || piece == 'B' || piece == 'Q' || piece == 'K')
+        return 'w';
+    else
+        return 'b';
 }
 
 string placeToString(int place) {
     char file = ((place - 1) / 8) + 1 + 'a' - 1;
-    char rank = ((place - 1) % 8 + 1) + '1' - 1;
+    char rank = ((place - 1) % 8) + 1 + '1' - 1;
     string temp = {file, rank};
     return temp;
 }
@@ -27,10 +31,7 @@ string getPointer(int xpos, int ypos, int scrw, int scrh)  // for mouse picking
     temp = (float)ypos / ((float)scrw / 10.0f);
     int rank = 10 - temp;
 
-    if (rank < 1 || file < 1 || rank > 8 || file > 8) {
-        cout << "Invalid Select";
-        return "BAD";
-    }
+    if (rank < 1 || file < 1 || rank > 8 || file > 8) { return "BAD"; }
 
     return placeToString(rank + 8 * (file - 1));
 }
@@ -176,19 +177,543 @@ string MyGame::getNotation() {
 }
 
 vector<pair<string, int>> MyGame::getPawnMoves(string place) {
-}
-vector<pair<string, int>> MyGame::getRookMoves(string place) {
-}
-vector<pair<string, int>> MyGame::getKnightMoves(string place) {
-}
-vector<pair<string, int>> MyGame::getBishopMoves(string place) {
-}
-vector<pair<string, int>> MyGame::getQueenMoves(string place) {
-}
-vector<pair<string, int>> MyGame::getKingMoves(string place) {
+    vector<pair<string, int>> temp;
+
+    int pos = placeToInt(place);
+    int file = ((pos - 1) / 8) + 1;
+    int rank = ((pos - 1) % 8) + 1;
+
+    if (turn == 'w') {
+        int tempFile = file;
+        int tempRank = rank + 1;
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') { temp.emplace_back(next, 0); }
+        }
+
+        if (rank == 2) {
+            tempFile = file;
+            tempRank = rank + 2;
+            cur = tempRank + 8 * (tempFile - 1);
+            if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+                string next = placeToString(cur);
+                char nextPiece = getPositonStatus(next);
+
+                if (nextPiece == 'e') { temp.emplace_back(next, 0); }
+            }
+        }
+
+        tempFile = file + 1;
+        tempRank = rank + 1;
+        cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if ((getColor(nextPiece) != turn && getColor(nextPiece) != 'e') || enPessant == next) {
+                temp.emplace_back(next, 1);
+            }
+        }
+
+        tempFile = file - 1;
+        tempRank = rank + 1;
+        cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if ((getColor(nextPiece) != turn && getColor(nextPiece) != 'e') || enPessant == next) {
+                temp.emplace_back(next, 1);
+            }
+        }
+
+    }
+    // for black
+    else {
+        int tempFile = file;
+        int tempRank = rank - 1;
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') { temp.emplace_back(next, 0); }
+        }
+
+        if (rank == 7) {
+            tempFile = file;
+            tempRank = rank - 2;
+            cur = tempRank + 8 * (tempFile - 1);
+            if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+                string next = placeToString(cur);
+                char nextPiece = getPositonStatus(next);
+
+                if (nextPiece == 'e') { temp.emplace_back(next, 0); }
+            }
+        }
+
+        tempFile = file + 1;
+        tempRank = rank - 1;
+        cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if ((getColor(nextPiece) != turn && getColor(nextPiece) != 'e') || enPessant == next) {
+                temp.emplace_back(next, 1);
+            }
+        }
+
+        tempFile = file - 1;
+        tempRank = rank - 1;
+        cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if ((getColor(nextPiece) != turn && getColor(nextPiece) != 'e') || enPessant == next) {
+                temp.emplace_back(next, 1);
+            }
+        }
+    }
+
+    return temp;
 }
 
-vector<pair<string, int>> MyGame::getPieceMoves(string place, char piece) {
+vector<pair<string, int>> MyGame::getRookMoves(string place) {
+    vector<pair<string, int>> temp;
+    int pos = placeToInt(place);
+    int file = ((pos - 1) / 8) + 1;
+    int rank = ((pos - 1) % 8) + 1;
+
+    int tempFile = file + 1;
+    int tempRank = rank;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempFile++;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+
+    tempFile = file - 1;
+    tempRank = rank;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempFile--;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+
+    tempFile = file;
+    tempRank = rank + 1;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempRank++;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+
+    tempFile = file;
+    tempRank = rank - 1;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempRank--;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+    return temp;
+}
+
+vector<pair<string, int>> MyGame::getKnightMoves(string place) {
+    vector<pair<string, int>> temp;
+    int pos = placeToInt(place);
+    int file = ((pos - 1) / 8) + 1;
+    int rank = ((pos - 1) % 8) + 1;
+
+    int tempFile = file - 1;
+    int tempRank = rank - 2;
+    int cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file - 1;
+    tempRank = rank + 2;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file - 2;
+    tempRank = rank - 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file - 2;
+    tempRank = rank + 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 1;
+    tempRank = rank - 2;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 1;
+    tempRank = rank + 2;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 2;
+    tempRank = rank - 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 2;
+    tempRank = rank + 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    return temp;
+}
+
+vector<pair<string, int>> MyGame::getBishopMoves(string place) {
+    vector<pair<string, int>> temp;
+
+    int pos = placeToInt(place);
+    int file = ((pos - 1) / 8) + 1;
+    int rank = ((pos - 1) % 8) + 1;
+
+    int tempFile = file + 1;
+    int tempRank = rank + 1;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempFile++;
+                tempRank++;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+    tempFile = file - 1;
+    tempRank = rank - 1;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempFile--;
+                tempRank--;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+
+    tempFile = file + 1;
+    tempRank = rank - 1;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempFile++;
+                tempRank--;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+
+    tempFile = file - 1;
+    tempRank = rank + 1;
+    while (tempFile <= 8 && tempFile >= 1 && tempRank <= 8 && tempRank >= 1) {
+        int cur = tempRank + 8 * (tempFile - 1);
+        if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+            string next = placeToString(cur);
+            char nextPiece = getPositonStatus(next);
+
+            if (nextPiece == 'e') {
+                temp.emplace_back(next, 0);
+                tempFile--;
+                tempRank++;
+            } else if (getColor(nextPiece) != turn) {
+                temp.emplace_back(next, 1);
+                break;
+            } else
+                break;
+        }
+    }
+    return temp;
+}
+
+vector<pair<string, int>> MyGame::getQueenMoves(string place) {
+    vector<pair<string, int>> temp;
+    vector<pair<string, int>> tempBish = getBishopMoves(place);
+    vector<pair<string, int>> tempRook = getRookMoves(place);
+
+    for (auto i: tempBish) temp.push_back(i);
+    for (auto i: tempRook) temp.push_back(i);
+    return temp;
+}
+
+vector<pair<string, int>> MyGame::getKingMoves(string place) {
+    vector<pair<string, int>> temp;
+
+    int pos = placeToInt(place);
+    int file = ((pos - 1) / 8) + 1;
+    int rank = ((pos - 1) % 8) + 1;
+
+    int tempFile = file;
+    int tempRank = rank - 1;
+    int cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file;
+    tempRank = rank + 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file - 1;
+    tempRank = rank - 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file - 1;
+    tempRank = rank + 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 1;
+    tempRank = rank - 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 1;
+    tempRank = rank + 1;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file - 1;
+    tempRank = rank;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    tempFile = file + 1;
+    tempRank = rank;
+    cur = tempRank + 8 * (tempFile - 1);
+    if (tempFile >= 1 && tempFile <= 8 && tempRank >= 1 && tempRank <= 8) {
+        string next = placeToString(cur);
+        char nextPiece = getPositonStatus(next);
+
+        if (nextPiece == 'e') {
+            temp.emplace_back(next, 0);
+        } else if (getColor(nextPiece) != turn) {
+            temp.emplace_back(next, 1);
+        }
+    }
+
+    return temp;
+}
+
+vector<pair<string, int>> MyGame::getPieceMoves(string place) {
+    char piece = getPositonStatus(place);
+    if (piece == 'e') {
+        vector<pair<string, int>> temp;
+        return temp;
+    }
     if (piece == 'p' || piece == 'P') return getPawnMoves(place);
     if (piece == 'r' || piece == 'R') return getRookMoves(place);
     if (piece == 'n' || piece == 'N') return getKnightMoves(place);
@@ -196,22 +721,56 @@ vector<pair<string, int>> MyGame::getPieceMoves(string place, char piece) {
     if (piece == 'q' || piece == 'Q') return getQueenMoves(place);
     if (piece == 'k' || piece == 'K') return getKingMoves(place);
 }
+
 int MyGame::processMove(string fir, string sec) {
     // 0 process move
-    // 1 game over show winner
+    // 1 checkmate game over show winner
     // 2 draw
-    // -1 reject move
-    if (fir == "BAD" || sec == "BAD") return -1;
-    char piece = getPositonStatus(fir);
-    bool color = isWhite(piece);
-    if ((color == true && turn == 'b') || (color == false && turn == 'w') || piece == 'e') return -1;
-    vector<pair<string, int>> nextMoves = getPieceMoves(fir, piece);
+    // -1 comrade
+    // -2 reject
 
-    for (auto i: nextMoves) {
+    char piece = getPositonStatus(fir);
+
+    vector<pair<string, int>> nextMoves = getPieceMoves(fir);
+
+    for (pair<string, int> i: nextMoves) {
         if (i.first == sec) {
-            if (i.second == 0) //comrade
-                return -1;
-            else {}
+            if (i.second == 0 || i.second == 1) {
+                chessTable.set(sec, piece);
+                chessTable.set(fir, 'e');
+
+                if (turn == 'w')
+                    turn = 'b';
+                else {
+                    turn = 'w';
+                    fullMoves++;
+                }
+
+                // en Pessant check
+                if (piece == 'p' || piece == 'P') {
+                    int rank1 = ((placeToInt(fir) - 1) % 8) + 1;
+                    int file1 = ((placeToInt(fir) - 1) / 8) + 1;
+
+                    int rank2 = ((placeToInt(sec) - 1) % 8) + 1;
+                    int file2 = ((placeToInt(sec) - 1) / 8) + 1;
+
+                    if ((rank2 - rank1) == 2)
+                        enPessant = placeToString((rank1 + 1) + 8 * (file1 - 1));
+                    else if ((rank1 - rank2) == 2)
+                        enPessant = placeToString((rank1 - 1) + 8 * (file1 - 1));
+                }
+
+                // castling check
+                if (piece == 'r' || piece == 'k' || piece == 'R' || piece == 'K') {}
+
+                // halfmove update
+                if (piece == 'p' || piece == 'P' || i.second == 1)
+                    halfMoves = 0;
+                else
+                    halfMoves++;
+
+                return 0;
+            }
         }
     }
     return -1;

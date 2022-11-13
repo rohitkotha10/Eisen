@@ -53,7 +53,13 @@ class my_app: public OpenGLApp {
     Texture KTex;
 
     MyGame myChess;
-    int preview;  // is move display on or off
+    string fir;
+    string sec;
+
+    string hisFir;
+    string hisSec;
+    bool preview;
+    vector<pair<string, int>> previewTable;
 
 public:
     void init() {
@@ -121,7 +127,7 @@ public:
         glfwSetCursorPosCallback(window, cursor_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-        myRenderer.init(100);
+        myRenderer.init(1000);
         preview = 0;
 
         PTex.loadTexture("../media/chess/wpawn.png", "chess");
@@ -171,13 +177,51 @@ public:
             }
         }
 
-        if (preview == 1) {
-            /* myRenderer.drawQuadColor(
-                 program, Quad(-1.0f + 1 * side, -1.0f + 1 * side, side), glm::vec4(1.0f, 1.0f, 0.0f, 0.6f));*/
+        // history
+        if (!(myChess.getTurn() == 'w' && myChess.getFullMoves() == 1)) {
+            int pos = placeToInt(hisFir);
+            int file = ((pos - 1) / 8) + 1;
+            int rank = ((pos - 1) % 8) + 1;
+
+            myRenderer.drawQuadColor(
+                program, Quad(-1.0f + file * side, -1.0f + rank * side, side), glm::vec4(1.0f, 1.0f, 0.0f, 0.6f));
+
+            pos = placeToInt(hisSec);
+            file = ((pos - 1) / 8) + 1;
+            rank = ((pos - 1) % 8) + 1;
+
+            myRenderer.drawQuadColor(
+                program, Quad(-1.0f + file * side, -1.0f + rank * side, side), glm::vec4(1.0f, 1.0f, 0.0f, 0.6f));
+        }
+
+        // previews
+        if (preview) {
+            int pos = placeToInt(fir);
+            int file = ((pos - 1) / 8) + 1;
+            int rank = ((pos - 1) % 8) + 1;
+            myRenderer.drawQuadColor(
+                program, Quad(-1.0f + file * side, -1.0f + rank * side, side), glm::vec4(1.0f, 1.0f, 0.0f, 0.6f));
+
+            for (auto i: previewTable) {
+                int tpos = placeToInt(i.first);
+                int tfile = ((tpos - 1) / 8) + 1;
+                int trank = ((tpos - 1) % 8) + 1;
+                if (i.second == 0) {
+                    myRenderer.drawQuadColor(
+                        program,
+                        Quad(-1.0f + tfile * side, -1.0f + trank * side, side),
+                        glm::vec4(1.0f, 0.0f, 0.0f, 0.3f));
+                } else {
+                    myRenderer.drawQuadColor(
+                        program,
+                        Quad(-1.0f + tfile * side, -1.0f + trank * side, side),
+                        glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
+                }
+            }
         }
 
         // pieces draw
-        for (int rank = 8; rank >= 0; rank--) {
+        for (int rank = 8; rank >= 1; rank--) {
             for (int file = 1; file <= 8; file++) {
                 string pos = placeToString(rank + 8 * (file - 1));
                 char piece = myChess.getPositonStatus(pos);
@@ -222,12 +266,26 @@ public:
 
     void onClick() {
         string cur = getPointer(xmouse, ymouse, screen_width, screen_height);
-        if (preview == 0) {
-        }
-
-        else if (preview == 1) {
-            int status = myChess.processMove(cur, cur);
+        if (cur == "BAD") return;
+        if (!preview) {
+            if (myChess.getTurn() != getColor(myChess.getPositonStatus(cur)) || myChess.getPositonStatus(cur) == 'e')
+                return;
+            fir = cur;
+            preview = true;
+            previewTable = myChess.getPieceMoves(fir);
+        } else {
+            if (myChess.getTurn() == getColor(myChess.getPositonStatus(cur))) {
+                fir = cur;
+                preview = true;
+                previewTable = myChess.getPieceMoves(fir);
+                return;
+            }
+            sec = cur;
+            preview = false;
+            int status = myChess.processMove(fir, sec);
             if (status == 0) {
+                hisFir = fir;
+                hisSec = sec;
             }
         }
     }
