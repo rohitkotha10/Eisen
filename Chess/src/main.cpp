@@ -207,15 +207,19 @@ public:
                 int tfile = ((tpos - 1) / 8) + 1;
                 int trank = ((tpos - 1) % 8) + 1;
                 if (i.second == 0) {
-                    myRenderer.drawQuadColor(
+                    myRenderer.drawCircle(
                         program,
                         Quad(-1.0f + tfile * side, -1.0f + trank * side, side),
-                        glm::vec4(1.0f, 0.0f, 0.0f, 0.3f));
+                        0.3f,
+                        0.0f,
+                        glm::vec4(0.0f, 0.0f, 0.0f, 0.1f));
                 } else {
-                    myRenderer.drawQuadColor(
+                    myRenderer.drawCircle(
                         program,
                         Quad(-1.0f + tfile * side, -1.0f + trank * side, side),
-                        glm::vec4(0.0f, 1.0f, 0.0f, 0.6f));
+                        0.95f,
+                        0.8f,
+                        glm::vec4(0.0f, 0.0f, 0.0f, 0.1f));
                 }
             }
         }

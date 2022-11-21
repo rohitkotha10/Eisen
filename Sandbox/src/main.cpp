@@ -162,10 +162,9 @@ public:
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        t1.start("First Frame");
 
-        t1.start("Startup");
-
-        ourModel.loadModel("../media/backpack/backpack.obj");
+        ourModel.loadModel("../media/cube/cube.obj");
     }
 
     void render(double currentTime) {
@@ -181,6 +180,9 @@ public:
         setMat4(program, "view_matrix", view);
         setMat4(program, "projection_matrix", projection);
         setMat4(program, "model_matrix", model);
+
+        setVec3(program, "lightPos", glm::vec3(2.0f, 2.0f, 2.0f));
+        setVec3(program, "viewPos", glm::vec3(cameraPos));
 
         ourModel.draw(program);
 

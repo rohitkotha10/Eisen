@@ -5,10 +5,17 @@ layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aTexPos;
 layout(location = 3) in vec4 aColor;
 layout(location = 4) in float aTexIndex;  // for batch render
+layout(location = 5) in float aIsCircle;
+layout(location = 6) in float aRadius;
+layout(location = 7) in float aCutoff;
 
+out vec2 pixelPos;
 out vec2 vTexPos;
 out vec4 vColor;
+out float vIsCircle;
 out float vTexIndex;
+out float vRadius;
+out float vCutoff;
 
 uniform mat4 model_matrix;
 uniform mat4 view_matrix;
@@ -18,5 +25,9 @@ void main() {
     gl_Position = projection_matrix * view_matrix * model_matrix * vec4(aPos, 1.0);
     vTexPos = aTexPos;
     vColor = aColor;
+    vIsCircle = aIsCircle;
     vTexIndex = aTexIndex;
+    pixelPos = aTexPos;
+    vRadius = aRadius;
+    vCutoff = aCutoff;
 };

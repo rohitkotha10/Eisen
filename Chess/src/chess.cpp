@@ -740,7 +740,6 @@ int MyGame::processMove(string fir, string sec) {
                 chessTable.set(fir, 'e');
 
                 if (sec == enPessant) {
-                    cout << "HERE" << endl;
                     int temp = placeToInt(sec);
                     int r = ((placeToInt(sec) - 1) % 8) + 1;
                     int f = ((placeToInt(sec) - 1) / 8) + 1;

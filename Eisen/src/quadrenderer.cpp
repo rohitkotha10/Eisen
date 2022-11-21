@@ -57,6 +57,15 @@ namespace Eisen {
         glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texIndex));
         glEnableVertexAttribArray(4);
 
+        glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, isCircle));
+        glEnableVertexAttribArray(5);
+
+        glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, radius));
+        glEnableVertexAttribArray(6);
+
+        glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, cutoff));
+        glEnableVertexAttribArray(7);
+
         glBindVertexArray(0);
     }
 
@@ -86,6 +95,7 @@ namespace Eisen {
         for (unsigned int i: temp) indices.push_back(i);
 
         for (Vertex vert: quad.vertices) {
+            vert.isCircle = 0.0f;
             vert.color = color;
             vert.texIndex = 0.0f;
             vertices.push_back(vert);
@@ -121,12 +131,33 @@ namespace Eisen {
         for (unsigned int i: temp) indices.push_back(i);
 
         for (Vertex vert: quad.vertices) {
+            vert.isCircle = 0.0f;
             vert.color = glm::vec4(1.0f);
             vert.texIndex = indTex;
             vertices.push_back(vert);
         }
     }
 
+    void QuadRenderer::drawCircle(GLuint& program, const Quad& quad, float radius, float cutoff, glm::vec4 color) {
+        if (indices.size() >= maxQuads * 6 || textures.size() >= 16) {
+            endBatch();
+            flush(program);
+            beginBatch();
+        }
+
+        unsigned int curInd = vertices.size();
+        vector<unsigned int> temp = {curInd + 0, curInd + 1, curInd + 2, curInd + 2, curInd + 3, curInd + 0};
+        for (unsigned int i: temp) indices.push_back(i);
+
+        for (Vertex vert: quad.vertices) {
+            vert.isCircle = 1.0f;
+            vert.radius = radius;
+            vert.cutoff = cutoff;
+            vert.color = color;
+            vert.texIndex = 0.0f;
+            vertices.push_back(vert);
+        }
+    }
     void QuadRenderer::endBatch() {
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);

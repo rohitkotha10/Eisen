@@ -19,7 +19,12 @@ namespace Eisen {
         glm::vec3 normal;
         glm::vec2 texPos;
         glm::vec4 color;
+
+        //for my quad renderer
         float texIndex;
+        float radius;
+        float cutoff;
+        float isCircle;
     };
 
     struct Texture {

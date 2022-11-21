@@ -2,31 +2,38 @@
 
 out vec4 FragColor;
 
+in vec2 pixelPos;
 in vec2 vTexPos;
 in vec4 vColor;
+in float vIsCircle;
 in float vTexIndex;
-
-struct Model {
-    sampler2D diffuse;   // active texture set to 0
-    sampler2D specular;  // active texture set to 1
-    vec4 color;
-    int hasTexture;
-};
+in float vRadius;
+in float vCutoff;
 
 uniform int isQuad;
 
 uniform sampler2D quadDiffuse[16];  // total 16 diffuse for batch 2 to 17 active
 
-uniform Model material;
-
 void main() {
     if (isQuad == 1) {
         int index = int(vTexIndex);
-        FragColor = texture(quadDiffuse[index], vTexPos) * vColor;
-    } else {
-        if (material.hasTexture == 0)
-            FragColor = material.color;  // diffuse set to whiteTex if no map
+        vec4 diffmap = texture(quadDiffuse[index], vTexPos) * vColor;
+
+        vec2 curVec = pixelPos;
+        curVec = curVec - vec2(0.5, 0.5);
+        curVec *= 2;
+
+        float distance = length(curVec);
+        if (vIsCircle == 1) {  // solid small circle
+            if (distance <= vRadius && distance >= vCutoff)
+                FragColor = vec4(diffmap);  // select this
+            else
+                FragColor = vec4(0.0f);
+            return;
+        }
+
         else
-            FragColor = texture(material.diffuse, vTexPos);
+            FragColor = vec4(diffmap);  // select this
+
     }
 };
