@@ -34,10 +34,6 @@ namespace Eisen {
         glBindVertexArray(0);
     }
 
-    void Mesh::createCube(float side, vector<Texture> textures, glm::vec4 color) {
-        
-    }
-
     void Mesh::draw(Program& program) {
         int numDiffuse = 0;
         int numSpecular = 0;

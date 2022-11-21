@@ -33,5 +33,6 @@ namespace Eisen {
         std::string path;
         void loadTexture(std::string path, std::string typeName);
         void loadWhiteTexture();  // for rendering colors
+        void loadSkybox(std::vector<std::string> faces);
     };
 }  // namespace Eisen

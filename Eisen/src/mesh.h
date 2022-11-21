@@ -15,7 +15,6 @@ namespace Eisen {
 
         void createMesh(
             std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures, glm::vec4 color);
-        void createCube(float side, std::vector<Texture> textures, glm::vec4 color);
         void draw(Program& program);
         void shutdown();
 

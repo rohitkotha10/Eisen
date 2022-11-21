@@ -27,7 +27,6 @@ namespace Eisen {
             int height = 600;
             int MajorVersion = 4;
             int MinorVersion = 5;
-            float* color = new float[4] {0.15f, 0.15f, 0.15f, 0.15f};
             bool fullscreen = 0;
             bool resize = 1;
         };

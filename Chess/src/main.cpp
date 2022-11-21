@@ -68,7 +68,6 @@ public:
         info.MajorVersion = 4;
         info.MinorVersion = 5;
         info.title = "Chess";
-        info.color = new float[4] {0.1f, 0.1f, 0.1f, 1.0f};
         info.fullscreen = false;
         info.resize = false;
     }
@@ -102,7 +101,11 @@ public:
     }
 
     void render(double currentTime) {
-        glDepthFunc(GL_ALWAYS);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         program.use();
 

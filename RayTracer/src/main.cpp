@@ -100,7 +100,6 @@ public:
         info.MajorVersion = 4;
         info.MinorVersion = 5;
         info.title = "Ray Tracer";
-        info.color = new float[4] {0.1f, 0.7f, 0.1f, 0.1f};
         info.fullscreen = false;
         info.resize = false;
     }

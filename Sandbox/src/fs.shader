@@ -18,33 +18,13 @@ uniform Model material;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
+uniform samplerCube skybox;
+
 void main() {
-    vec3 diffuse = vec3(0.0f);
-    vec3 ambient = vec3(0.0f);
-    vec3 specular = vec3(0.0f);
+    vec3 incident = normalize(fragPos - viewPos);
+    vec3 reflect = reflect(incident, normalize(vNormal));
 
-    if (material.hasTexture == 0) {
-        diffuse = vec3(material.color);
-        specular = 0.5 * vec3(1.0f);
-    } else {
-        diffuse = vec3(texture(material.diffuse, vTexPos));
-        specular = vec3(texture(material.specular, vTexPos));
-    }
-
-    vec3 norm = normalize(vNormal);
-    vec3 lightDir = normalize(lightPos - fragPos);
-    vec3 viewDir = normalize(viewPos - fragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-
-    ambient = 0.3f * diffuse;
-
-    float diff = max(dot(norm, lightDir), 0.0f);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0f);
-
-    diffuse = diff * diffuse;
-    specular = spec * specular;
-
-    vec3 result = ambient + diffuse + specular;
-
-    FragColor = vec4(result, 1.0);
+    float ratio = 1.00 / 1.52;
+    vec3 refract = refract(incident, normalize(vNormal), ratio);
+    FragColor = vec4(texture(skybox, refract).rgb, 1.0f);
 };
