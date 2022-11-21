@@ -18,9 +18,9 @@ namespace Eisen {
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec2 texPos;
-        glm::vec4 color;
 
-        //for my quad renderer
+        // for my quad renderer
+        glm::vec4 color;
         float texIndex;
         float radius;
         float cutoff;
@@ -32,6 +32,6 @@ namespace Eisen {
         std::string type;
         std::string path;
         void loadTexture(std::string path, std::string typeName);
-        void loadWhiteTexture();
+        void loadWhiteTexture();  // for rendering colors
     };
 }  // namespace Eisen

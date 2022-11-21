@@ -169,20 +169,19 @@ namespace Eisen {
 
     void QuadRenderer::flush(Program& program) {
         program.use();
-        glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, whiteTex.id);
 
         for (int i = 0; i < textures.size(); i++) {
-            glActiveTexture(GL_TEXTURE3 + i);
+            glActiveTexture(GL_TEXTURE1 + i);
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
 
         int data[16];
-        for (int i = 0; i < 16; i++) data[i] = i + 2;
+        for (int i = 0; i < 16; i++) data[i] = i;
         program.setIntArray("quadDiffuse", 16, &data[0]);
 
         glBindVertexArray(vao);
-        program.setInt("isQuad", 1);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }

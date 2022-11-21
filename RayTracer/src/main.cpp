@@ -88,16 +88,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class my_app: public OpenGLApp {
     Program myProgram;
-    Program myProgram1;
-
-    GLuint fbo;
-    GLuint texture;
-    GLuint rbo;
-
-    GLuint quadvao;
-    GLuint quadvbo;
-    GLuint quadebo;
-
     Importer ourModel;
 
     int start = 0;
@@ -109,16 +99,13 @@ public:
         info.height = screen_height;
         info.MajorVersion = 4;
         info.MinorVersion = 5;
-        info.title = "Sandbox";
-        info.color = new float[4] {0.1f, 0.1f, 0.1f, 0.1f};
+        info.title = "Ray Tracer";
+        info.color = new float[4] {0.1f, 0.7f, 0.1f, 0.1f};
         info.fullscreen = false;
         info.resize = false;
     }
 
-    void shaderCompile() {
-        myProgram.create("src/vs.shader", "src/fs.shader");
-        myProgram1.create("src/vs1.shader", "src/fs1.shader");
-    }
+    void shaderCompile() { myProgram.create("src/vs.shader", "src/fs.shader"); }
 
     void startup() {
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -129,53 +116,8 @@ public:
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         t1.start("First Frame");
-        glGenVertexArrays(1, &quadvao);
-        glGenBuffers(1, &quadvbo);
-        glGenBuffers(1, &quadebo);
 
-        glBindVertexArray(quadvao);
-        glBindBuffer(GL_ARRAY_BUFFER, quadvbo);
-        static const float vertices[] = {-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 0.0f, 1.0f, 0.0f,
-                                         1.0f,  1.0f,  0.0f, 1.0f, 1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 1.0f};
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0));
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        static const GLuint indices[] = {0, 1, 2, 2, 3, 0};
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
-
-        glGenFramebuffers(1, &fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-        glGenRenderbuffers(1, &rbo);
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screen_width, screen_height);
-
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screen_width, screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            cout << "Error: Incomplete framebuffer" << endl;
-        else
-            cout << "GOOD" << endl;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        ourModel.loadModel("../media/cube/cube.obj");
+        ourModel.loadModel("../media/test/test.obj");
     }
 
     void render(double currentTime) {
@@ -183,14 +125,14 @@ public:
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        myProgram.use();
-
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
+        myProgram.use();
+
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.5f));
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
         glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
         myProgram.setMat4("view_matrix", view);
@@ -202,22 +144,12 @@ public:
 
         ourModel.draw(myProgram);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        myProgram1.use();
-        glBindVertexArray(quadvao);
-        glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
         if (start == 0) {
             t1.display();
             start = 1;
         }
 
-         onKeyUpdate();
+        onKeyUpdate();
     }
 
     void onKeyUpdate() {
@@ -233,8 +165,6 @@ public:
 
     void shutdown() {
         myProgram.shutdown();
-        myProgram1.shutdown();
-        glDeleteFramebuffers(1, &fbo);
         ourModel.shutdown();
     }
 };

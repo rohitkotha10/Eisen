@@ -35,7 +35,7 @@ void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 class my_app: public OpenGLApp {
-    GLuint program;
+    Program program;
     QuadRenderer myRenderer;
 
     Texture pTex;
@@ -73,53 +73,7 @@ public:
         info.resize = false;
     }
 
-    void shaderCompile() {
-        // vertex shader
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        string trial = parse("src/vs.shader");
-        const GLchar* vsSource = trial.c_str();
-        glShaderSource(vs, 1, &vsSource, NULL);
-        glCompileShader(vs);
-
-        int success;
-        glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            char infoLog[512];
-            glGetShaderInfoLog(vs, 512, NULL, infoLog);
-            cout << "Vertex Shader Error\n" << infoLog << endl;
-        }
-
-        // frag shader
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        trial = parse("src/fs.shader");
-        const GLchar* fsSource = trial.c_str();
-        glShaderSource(fs, 1, &fsSource, NULL);
-        glCompileShader(fs);
-
-        success = 0;
-        glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            char infoLog[512];
-            glGetShaderInfoLog(fs, 512, NULL, infoLog);
-            cout << "Frag Shader Error\n" << infoLog << endl;
-        }
-
-        program = glCreateProgram();
-        glAttachShader(program, vs);
-        glAttachShader(program, fs);
-        glLinkProgram(program);
-
-        success = 0;
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        if (!success) {
-            char infoLog[512];
-            glGetProgramInfoLog(program, 512, NULL, infoLog);
-            cout << "Shader Linking Error\n" << infoLog << endl;
-        }
-
-        glDeleteShader(vs);
-        glDeleteShader(fs);
-    }
+    void shaderCompile() { program.create("src/vs.shader", "src/fs.shader"); }
 
     void startup() {
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -150,16 +104,16 @@ public:
     void render(double currentTime) {
         glDepthFunc(GL_ALWAYS);
 
-        glUseProgram(program);
+        program.use();
 
         myRenderer.beginBatch();
 
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 100.0f);
-        setMat4(program, "view_matrix", view);
-        setMat4(program, "projection_matrix", projection);
-        setMat4(program, "model_matrix", model);
+        program.setMat4("view_matrix", view);
+        program.setMat4("projection_matrix", projection);
+        program.setMat4("model_matrix", model);
 
         glm::vec4 colorBlack(0.5f, 0.6f, 0.3f, 1.0f);
         glm::vec4 colorWhite(1.0f, 1.0f, 1.0f, 1.0f);
@@ -295,7 +249,7 @@ public:
     }
 
     void shutdown() {
-        glDeleteProgram(program);
+        program.shutdown();
         myRenderer.shutdown();
     }
 };

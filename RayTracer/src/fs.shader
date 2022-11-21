@@ -1,5 +1,5 @@
 #version 450 core
-// Phong Lighting shader
+
 out vec4 FragColor;
 
 in vec3 vNormal;
