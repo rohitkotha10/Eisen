@@ -15,14 +15,14 @@ namespace Eisen {
         void init(int maxQuads);
         void beginBatch();
         void endBatch();
-        void flush(GLuint& program);
-        void drawQuadColor(GLuint& program, const Quad& quad, glm::vec4 color);  // color is set to vertices
-        void drawQuadTexture(GLuint& program, const Quad& quad, Texture& texture);
+        void flush(Program& program);
+        void drawQuadColor(Program& program, const Quad& quad, glm::vec4 color);  // color is set to vertices
+        void drawQuadTexture(Program& program, const Quad& quad, Texture& texture);
         // circles drawn inside quad;
         // need percentage for radius and cutoff
         // cutoff = 0.0f for full circle
         // radius = 1.0f for diameter side
-        void drawCircle(GLuint& program, const Quad& quad, float radius, float cutoff, glm::vec4 color);
+        void drawCircle(Program& program, const Quad& quad, float radius, float cutoff, glm::vec4 color);
         void shutdown();
 
     private:

@@ -82,7 +82,7 @@ namespace Eisen {
         textures.clear();
     }
 
-    void QuadRenderer::drawQuadColor(GLuint& program, const Quad& quad, glm::vec4 color) {
+    void QuadRenderer::drawQuadColor(Program& program, const Quad& quad, glm::vec4 color) {
         // copy vertices to dynamic array and update indices
         if (indices.size() >= maxQuads * 6 || textures.size() >= 16) {
             endBatch();
@@ -102,7 +102,7 @@ namespace Eisen {
         }
     }
 
-    void QuadRenderer::drawQuadTexture(GLuint& program, const Quad& quad, Texture& texture) {
+    void QuadRenderer::drawQuadTexture(Program& program, const Quad& quad, Texture& texture) {
         // copy vertices to dynamic array and update indices
         if (indices.size() >= maxQuads * 6 || textures.size() >= 16) {
             endBatch();
@@ -138,7 +138,7 @@ namespace Eisen {
         }
     }
 
-    void QuadRenderer::drawCircle(GLuint& program, const Quad& quad, float radius, float cutoff, glm::vec4 color) {
+    void QuadRenderer::drawCircle(Program& program, const Quad& quad, float radius, float cutoff, glm::vec4 color) {
         if (indices.size() >= maxQuads * 6 || textures.size() >= 16) {
             endBatch();
             flush(program);
@@ -167,8 +167,8 @@ namespace Eisen {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
     }
 
-    void QuadRenderer::flush(GLuint& program) {
-        glUseProgram(program);
+    void QuadRenderer::flush(Program& program) {
+        program.use();
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, whiteTex.id);
 
@@ -179,10 +179,10 @@ namespace Eisen {
 
         int data[16];
         for (int i = 0; i < 16; i++) data[i] = i + 2;
-        setIntArray(program, "quadDiffuse", 16, &data[0]);
+        program.setIntArray("quadDiffuse", 16, &data[0]);
 
         glBindVertexArray(vao);
-        setInt(program, "isQuad", 1);
+        program.setInt("isQuad", 1);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }

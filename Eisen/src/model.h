@@ -15,7 +15,7 @@ namespace Eisen {
 
         void createMesh(
             std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures, glm::vec4 color);
-        void draw(GLuint& program);
+        void draw(Program& program);
         void shutdown();
 
     private:
@@ -30,7 +30,7 @@ namespace Eisen {
     class Model {
     public:
         void loadModel(std::string path);
-        void draw(GLuint& program);
+        void draw(Program& program);
         void shutdown();
 
     private:

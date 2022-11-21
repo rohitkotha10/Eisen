@@ -41,7 +41,7 @@ namespace Eisen {
         glBindVertexArray(0);
     }
 
-    void Mesh::draw(GLuint& program) {
+    void Mesh::draw(Program& program) {
         int numDiffuse = 0;
         int numSpecular = 0;
         for (unsigned int i = 0; i < textures.size(); i++) {
@@ -51,12 +51,12 @@ namespace Eisen {
             if (name == "diffuse" && numDiffuse <= 1) {
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
-                setInt(program, "material.diffuse", 0);
+                program.setInt("material.diffuse", 0);
                 numDiffuse++;
             } else if (name == "specular" && numSpecular <= 1) {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, textures[i].id);
-                setInt(program, "material.specular", 1);
+                program.setInt("material.specular", 1);
                 numSpecular++;
             } else {
                 cout << "Unknown texture type: " << textures[i].path << endl;
@@ -65,15 +65,15 @@ namespace Eisen {
         if (numSpecular > 1 || numDiffuse > 1) cout << "Only 1 diffuse and 1 specular supported!" << endl;
 
         if (numDiffuse == 0)
-            setInt(program, "material.hasTexture", 0);
+            program.setInt("material.hasTexture", 0);
         else
-            setInt(program, "material.hasTexture", 1);
+            program.setInt("material.hasTexture", 1);
 
         glActiveTexture(GL_TEXTURE0);
 
         glBindVertexArray(vao);
-        setVec4(program, "material.color", this->color);
-        setInt(program, "isQuad", 0);
+        program.setVec4("material.color", this->color);
+        program.setInt("isQuad", 0);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
@@ -85,7 +85,7 @@ namespace Eisen {
         for (int i = 0; i < textures.size(); i++) glDeleteTextures(1, &textures[i].id);
     }
 
-    void Model::draw(GLuint& program) {
+    void Model::draw(Program& program) {
         for (unsigned int i = 0; i < meshes.size(); i++) meshes[i].draw(program);
     }
 

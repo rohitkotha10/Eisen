@@ -17,32 +17,92 @@ namespace Eisen {
         return final;
     };
 
-    void setInt(GLuint program, string name, int value) {
-        glUniform1i(glGetUniformLocation(program, name.c_str()), value);
-    }
-    void setFloat(GLuint program, string name, float value) {
-        glUniform1f(glGetUniformLocation(program, name.c_str()), value);
-    }
-    void setMat4(GLuint program, string name, const glm::mat4& data) {
-        glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, &data[0][0]);
-    }
-    void setVec3(GLuint program, string name, float x, float y, float z) {
-        glUniform3f(glGetUniformLocation(program, name.c_str()), x, y, z);
+    void Program::create(string vsString, string fsString) {
+        // vertex shader
+        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+        string trial = parse(vsString);
+        const GLchar* vsSource = trial.c_str();
+        glShaderSource(vs, 1, &vsSource, NULL);
+        glCompileShader(vs);
+
+        int success;
+        glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetShaderInfoLog(vs, 512, NULL, infoLog);
+            cout << "Vertex Shader Error\n" << infoLog << endl;
+        }
+
+        // frag shader
+        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+        trial = parse(fsString);
+        const GLchar* fsSource = trial.c_str();
+        glShaderSource(fs, 1, &fsSource, NULL);
+        glCompileShader(fs);
+
+        success = 0;
+        glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetShaderInfoLog(fs, 512, NULL, infoLog);
+            cout << "Frag Shader Error\n" << infoLog << endl;
+        }
+
+        this->id = glCreateProgram();
+        glAttachShader(this->id, vs);
+        glAttachShader(this->id, fs);
+        glLinkProgram(this->id);
+
+        success = 0;
+        glGetProgramiv(this->id, GL_LINK_STATUS, &success);
+        if (!success) {
+            char infoLog[512];
+            glGetProgramInfoLog(this->id, 512, NULL, infoLog);
+            cout << "Shader Linking Error\n" << infoLog << endl;
+        }
+
+        glDeleteShader(vs);
+        glDeleteShader(fs);
     }
 
-    void setVec3(GLuint program, string name, const glm::vec3& data) {
-        glUniform3fv(glGetUniformLocation(program, name.c_str()), 1, &data[0]);
-    }
-    void setVec4(GLuint program, string name, float x, float y, float z, float a) {
-        glUniform4f(glGetUniformLocation(program, name.c_str()), x, y, z, a);
+    void Program::use() {
+        glUseProgram(this->id);
     }
 
-    void setVec4(GLuint program, string name, const glm::vec4& data) {
-        glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, &data[0]);
+    void Program::shutdown() {
+        glDeleteProgram(this->id);
     }
 
-    void setIntArray(GLuint program, string name, int size, int* data) {
-        glUniform1iv(glGetUniformLocation(program, name.c_str()), size, data);
+    void Program::setInt(string name, int value) {
+        glUniform1i(glGetUniformLocation(this->id, name.c_str()), value);
+    }
+
+    void Program::setFloat(string name, float value) {
+        glUniform1f(glGetUniformLocation(this->id, name.c_str()), value);
+    }
+
+    void Program::setMat4(string name, const glm::mat4& data) {
+        glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, &data[0][0]);
+    }
+
+    void Program::setVec3(string name, float x, float y, float z) {
+        glUniform3f(glGetUniformLocation(this->id, name.c_str()), x, y, z);
+    }
+
+    void Program::setVec3(string name, const glm::vec3& data) {
+        glUniform3fv(glGetUniformLocation(this->id, name.c_str()), 1, &data[0]);
+    }
+
+    void Program::setVec4(string name, float x, float y, float z, float a) {
+        glUniform4f(glGetUniformLocation(this->id, name.c_str()), x, y, z, a);
+    }
+
+    void Program::setVec4(string name, const glm::vec4& data) {
+        glUniform4fv(glGetUniformLocation(this->id, name.c_str()), 1, &data[0]);
+    }
+
+    void Program::setIntArray(string name, int size, int* data) {
+        glUniform1iv(glGetUniformLocation(this->id, name.c_str()), size, data);
     }
 
 }  // namespace Eisen
