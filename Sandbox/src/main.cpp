@@ -88,6 +88,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class my_app: public OpenGLApp {
     GLuint program;
+    GLuint fbo;
+    GLuint texture;
+
 
     glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
     Model ourModel;
@@ -162,12 +165,27 @@ public:
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
         t1.start("First Frame");
+
+        glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);  
 
         ourModel.loadModel("../media/cube/cube.obj");
     }
 
     void render(double currentTime) {
+        glViewport(0, 0, 640, 360);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         float currentFrame = (float)currentTime;
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -190,6 +208,10 @@ public:
             t1.display();
             start = 1;
         }
+
+        glViewport(640, 360, 640, 360);
+        ourModel.draw(program);
+
         onKeyUpdate();
     }
 
@@ -206,6 +228,7 @@ public:
 
     void shutdown() {
         glDeleteProgram(program);
+        glDeleteFramebuffers(1, &fbo);
         ourModel.shutdown();
     }
 };
