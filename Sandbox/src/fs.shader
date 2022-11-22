@@ -26,5 +26,5 @@ void main() {
 
     float ratio = 1.00 / 1.52;
     vec3 refract = refract(incident, normalize(vNormal), ratio);
-    FragColor = vec4(texture(skybox, refract).rgb, 1.0f);
+    FragColor = vec4(texture(skybox, reflect).rgb, 1.0f);
 };

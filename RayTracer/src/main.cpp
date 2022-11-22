@@ -116,7 +116,7 @@ public:
 
         t1.start("First Frame");
 
-        ourModel.loadModel("../media/test/test.obj");
+        ourModel.loadModel("../media/cube/cube.obj");
     }
 
     void render(double currentTime) {

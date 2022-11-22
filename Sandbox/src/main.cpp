@@ -168,7 +168,6 @@ public:
         glBindVertexArray(skyboxVAO);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture.id);
         model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(4.0f));
         view = glm::mat4(glm::mat3(glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp)));
         projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
         myProgram1.setMat4("projection_matrix", projection);
