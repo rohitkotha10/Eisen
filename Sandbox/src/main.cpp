@@ -194,6 +194,17 @@ public:
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) cameraPos += cameraSpeed * cameraRight;
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) cameraPos -= cameraSpeed * cameraUp;
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) cameraPos += cameraSpeed * cameraUp;
+
+        // roll, q and e
+        float rollSpeed = 50.0f * deltaTime;
+
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            worldUp = glm::mat3(glm::rotate(glm::mat4(1.0f), -glm::radians(rollSpeed), cameraFront)) * cameraUp;
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            worldUp = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(rollSpeed), cameraFront)) * cameraUp;
+
+        cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));
+        cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
     }
 
     void shutdown() {
