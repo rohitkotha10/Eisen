@@ -50,17 +50,21 @@ void main() {
     diffuse = diff * diffuse;
     specular = spec * specular;
 
-    // dont do this division in vertex shader!!!
     vec3 temp = fragInLight.xyz / fragInLight.w;
 
     float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
     temp = temp * 0.5f + 0.5f;
-    float depVal = texture(depthMap, temp.xy).r;
-    float shadow;
-    if (temp.z - bias > depVal)
-        shadow = 1.0f;
-    else
-        shadow = 0.0f;
+
+    float shadow = 0.0f;
+    vec2 texelSize = 1.0 / textureSize(depthMap, 0);
+    for (int i = -1; i < 1; i++) {
+        for (int j = -1; j < 1; j++) {
+            vec2 sel = temp.xy + vec2(i, j) * texelSize;
+            float depTemp = texture(depthMap, sel).r;
+            if (temp.z - bias > depTemp) shadow += 1.0f;
+        }
+    }
+    shadow = shadow / 9.0f;
 
     if (temp.z >= 1.0 - bias) shadow = 0.0f;
 
