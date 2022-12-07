@@ -1,5 +1,5 @@
 #version 450 core
-// Phong Lighting shader
+
 out vec4 FragColor;
 
 in vec3 vNormal;
@@ -26,5 +26,6 @@ void main() {
 
     float ratio = 1.00 / 1.52;
     vec3 refract = refract(incident, normalize(vNormal), ratio);
-    FragColor = vec4(texture(skybox, reflect).rgb, 1.0f);
+
+    FragColor = vec4(texture(skybox, refract).rgb, 1.0f);
 };

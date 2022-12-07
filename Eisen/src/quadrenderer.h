@@ -2,7 +2,6 @@
 #include "primitives.h"
 
 namespace Eisen {
-
     class Quad {
     public:
         Quad(float x, float y, float size);  // lower left corner x,y. square side(size)
@@ -10,6 +9,7 @@ namespace Eisen {
         std::vector<unsigned int> indices;
         Texture tex;
     };
+
     class QuadRenderer {
     public:
         void init(int maxQuads);
@@ -32,7 +32,7 @@ namespace Eisen {
 
         std::vector<Vertex> vertices;
         std::vector<GLuint> indices;
-        std::vector<Texture> textures;  // max textures per batch is 16 set from active 3 to 18
+        std::vector<Texture> textures;  // max textures per batch is 16
 
         int maxQuads;      // max quads in one draw call/batch
         Texture whiteTex;  // for colors

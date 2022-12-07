@@ -1,5 +1,4 @@
 #pragma once
-#include "primitives.h"
 #include "mesh.h"
 
 #include <assimp/Importer.hpp>
@@ -7,7 +6,6 @@
 #include <assimp/postprocess.h>
 
 namespace Eisen {
-
     class Importer {
     public:
         void loadModel(std::string path);
@@ -24,5 +22,4 @@ namespace Eisen {
         std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
         glm::vec4 loadColor(aiMaterial* mat);
     };
-
 }  // namespace Eisen

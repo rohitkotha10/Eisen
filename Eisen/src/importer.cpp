@@ -3,7 +3,6 @@
 using namespace std;
 
 namespace Eisen {
-
     void Importer::draw(Program& program) {
         for (unsigned int i = 0; i < meshes.size(); i++) meshes[i].draw(program);
     }

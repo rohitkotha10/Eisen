@@ -1,5 +1,7 @@
 #include "Application.h"
 
+using namespace std;
+
 namespace Eisen {
     void OpenGLApp::run() {
         glfwInit();
@@ -16,7 +18,7 @@ namespace Eisen {
             info.width, info.height, info.title.c_str(), info.fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 
         if (window == NULL) {
-            std::cout << "Failed to create GLFW window" << std::endl;
+            cout << "Failed to create GLFW window" << endl;
             glfwTerminate();
             return;
         }
@@ -24,13 +26,13 @@ namespace Eisen {
         glfwMakeContextCurrent(window);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-            std::cout << "Failed to initialize GLAD" << std::endl;
+            cout << "Failed to initialize GLAD" << endl;
             return;
         }
 
-        std::cout << glGetString(GL_VENDOR) << std::endl;
-        std::cout << glGetString(GL_VERSION) << std::endl;
-        std::cout << glGetString(GL_RENDERER) << std::endl << std::endl;
+        cout << glGetString(GL_VENDOR) << endl;
+        cout << glGetString(GL_VERSION) << endl;
+        cout << glGetString(GL_RENDERER) << endl << endl;
 
         // starts app from here
         shaderCompile();

@@ -95,6 +95,7 @@ class my_app: public OpenGLApp {
     Texture cubemapTexture;
 
     Importer ourModel;
+    Importer table;
 
     int start = 0;
     Timer t1;
@@ -134,6 +135,7 @@ public:
         cubemapTexture.loadSkybox(faces);
 
         ourModel.loadModel("../media/cube/cube.obj");
+        table.loadModel("../media/table/table.obj");
     }
 
     void render(double currentTime) {
@@ -161,7 +163,7 @@ public:
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture.id);
         myProgram.setInt("skybox", 2);
 
-        ourModel.draw(myProgram);
+        table.draw(myProgram);
 
         myProgram1.use();
         glDepthFunc(GL_LEQUAL);

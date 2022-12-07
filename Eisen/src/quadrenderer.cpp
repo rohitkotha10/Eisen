@@ -3,7 +3,6 @@
 using namespace std;
 
 namespace Eisen {
-
     Quad::Quad(float x, float y, float size) {
         Vertex a0;
         a0.position = glm::vec3(x, y, 0.0f);
@@ -158,6 +157,7 @@ namespace Eisen {
             vertices.push_back(vert);
         }
     }
+
     void QuadRenderer::endBatch() {
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);

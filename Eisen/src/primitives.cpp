@@ -3,7 +3,6 @@
 using namespace std;
 
 namespace Eisen {
-
     void Texture::loadWhiteTexture() {
         glGenTextures(1, &(this->id));
         glBindTexture(GL_TEXTURE_2D, this->id);
@@ -48,7 +47,6 @@ namespace Eisen {
         this->path = path;
     }
 
-    
     void Texture::loadSkybox(vector<string> faces) {
         glGenTextures(1, &this->id);
         glBindTexture(GL_TEXTURE_CUBE_MAP, this->id);
@@ -79,5 +77,4 @@ namespace Eisen {
             }
         }
     }
-
 }  // namespace Eisen

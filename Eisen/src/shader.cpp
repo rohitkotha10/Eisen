@@ -104,5 +104,4 @@ namespace Eisen {
     void Program::setIntArray(string name, int size, int* data) {
         glUniform1iv(glGetUniformLocation(this->id, name.c_str()), size, data);
     }
-
 }  // namespace Eisen

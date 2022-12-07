@@ -15,7 +15,6 @@ int press = 0;
 int screen_width = 800;
 int screen_height = 800;
 float screen_aspect = (float)screen_width / (float)screen_height;
-float fov = 45.0f;
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) press = 1;
