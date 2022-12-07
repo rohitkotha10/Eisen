@@ -56,15 +56,21 @@ namespace Eisen {
         }
         if (numSpecular > 1 || numDiffuse > 1) cout << "Only 1 diffuse and 1 specular supported!" << endl;
 
-        if (numDiffuse == 0)
-            program.setInt("material.hasTexture", 0);
-        else
-            program.setInt("material.hasTexture", 1);
+        program.setVec4("material.color", this->color);
+        if (numDiffuse == 0) {
+            program.setInt("material.hasDiffMap", 0);
+            program.setInt("material.hasSpecMap", 0);
+        } else {
+            program.setInt("material.hasDiffMap", 1);
+            if (numSpecular == 0)
+                program.setInt("material.hasSpecMap", 0);
+            else if (numSpecular == 1)
+                program.setInt("material.hasSpecMap", 1);
+        }
 
         glActiveTexture(GL_TEXTURE0);
 
         glBindVertexArray(vao);
-        program.setVec4("material.color", this->color);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }

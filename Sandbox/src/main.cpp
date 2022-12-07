@@ -89,6 +89,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 class my_app: public OpenGLApp {
     Program myProgram;
 
+    Importer ourModel;
     Mesh myPlane;
     Texture wood;
 
@@ -145,6 +146,7 @@ public:
         textures.push_back(wood);
         
         myPlane.createMesh(vertices, indices, textures, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        ourModel.loadModel("../media/backpack/backpack.obj");
     }
 
     void render(double currentTime) {
@@ -161,14 +163,20 @@ public:
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
 
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.3f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.3f, 0.0f));
 
         myProgram.setMat4("projection_matrix", projection);
         myProgram.setMat4("view_matrix", view);
         myProgram.setMat4("model_matrix", model);
 
-        myProgram.setVec3("lightPos", glm::vec3(0.0f, 1.0f, 0.0f));
+        myProgram.setVec3("lightPos", glm::vec3(1.0f, 1.0f, 1.0f));
         myProgram.setVec3("viewPos", glm::vec3(cameraPos));
 
+        ourModel.draw(myProgram);
+
+        model = glm::mat4(1.0f);
+        myProgram.setMat4("model_matrix", model);
         myPlane.draw(myProgram);
 
         if (start == 0) {
@@ -204,6 +212,7 @@ public:
     void shutdown() {
         myProgram.shutdown();
         myPlane.shutdown();
+        ourModel.shutdown();
     }
 };
 
