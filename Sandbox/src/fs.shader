@@ -1,9 +1,9 @@
 #version 450 core
-
+// Blinn Phong
 out vec4 FragColor;
 
-in vec3 vNormal;
 in vec3 fragPos;
+in vec3 vNormal;
 in vec2 vTexPos;
 
 struct Model {
@@ -18,14 +18,33 @@ uniform Model material;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
-uniform samplerCube skybox;
-
 void main() {
-    vec3 incident = normalize(fragPos - viewPos);
-    vec3 reflect = reflect(incident, normalize(vNormal));
+    vec3 diffuse = vec3(0.0f);
+    vec3 ambient = vec3(0.0f);
+    vec3 specular = vec3(0.0f);
 
-    float ratio = 1.00 / 1.52;
-    vec3 refract = refract(incident, normalize(vNormal), ratio);
+    if (material.hasTexture == 0) {
+        diffuse = vec3(material.color);
+        specular = 0.3 * vec3(1.0f);
+    } else {
+        diffuse = vec3(texture(material.diffuse, vTexPos));
+        specular = 0.3 * vec3(1.0f);
+    }
 
-    FragColor = vec4(texture(skybox, refract).rgb, 1.0f);
+    vec3 norm = normalize(vNormal);
+    vec3 lightDir = normalize(lightPos - fragPos);
+    vec3 viewDir = normalize(viewPos - fragPos);
+    vec3 reflectDir = reflect(-lightDir, norm);
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+
+    float diff = max(dot(norm, lightDir), 0.0f);
+    float spec = pow(max(dot(viewDir, halfwayDir), 0.0), 8.0f);
+
+    ambient = 0.03f * diffuse;
+    diffuse = diff * diffuse;
+    specular = spec * specular;
+
+    vec3 result = ambient + diffuse + specular;
+
+    FragColor = vec4(result, 1.0);
 };

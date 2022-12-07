@@ -88,14 +88,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class my_app: public OpenGLApp {
     Program myProgram;
-    Program myProgram1;
 
-    GLuint skyboxVAO;
-    GLuint skyboxVBO;
-    Texture cubemapTexture;
-
-    Importer ourModel;
-    Importer table;
+    Mesh myPlane;
+    Texture wood;
 
     int start = 0;
     Timer t1;
@@ -111,10 +106,7 @@ public:
         info.resize = false;
     }
 
-    void shaderCompile() {
-        myProgram.create("src/vs.shader", "src/fs.shader");
-        myProgram1.create("src/vs1.shader", "src/fs1.shader");
-    }
+    void shaderCompile() { myProgram.create("src/vs.shader", "src/fs.shader"); }
 
     void startup() {
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -123,19 +115,36 @@ public:
         glfwSetMouseButtonCallback(window, mouse_button_callback);
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
         t1.start("First Frame");
-        vector<string> faces = {
-            "../media/skybox/right.jpg",
-            "../media/skybox/left.jpg",
-            "../media/skybox/top.jpg",
-            "../media/skybox/bottom.jpg",
-            "../media/skybox/front.jpg",
-            "../media/skybox/back.jpg"};
-        cubemapTexture.loadSkybox(faces);
 
-        ourModel.loadModel("../media/cube/cube.obj");
-        table.loadModel("../media/table/table.obj");
+        Vertex a0;
+        a0.position = glm::vec3(10.0f, -0.5f, 10.0f);
+        a0.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+        a0.texPos = glm::vec2(10.0f, 0.0f);
+
+        Vertex a1;
+        a1.position = glm::vec3(-10.0f, -0.5f, 10.0f);
+        a1.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+        a1.texPos = glm::vec2(0.0f, 0.0f);
+
+        Vertex a2;
+        a2.position = glm::vec3(-10.0f, -0.5f, -10.0f);
+        a2.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+        a2.texPos = glm::vec2(0.0f, 10.0f);
+
+        Vertex a3;
+        a3.position = glm::vec3(10.0f, -0.5f, -10.0f);
+        a3.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+        a3.texPos = glm::vec2(10.0f, 10.0f);
+
+        vector<Vertex> vertices = {a0, a1, a2, a3};
+        vector<GLuint> indices = {0, 1, 2, 0, 2, 3};
+
+        wood.loadTexture("../media/wood.png", "diffuse");
+        vector<Texture> textures;
+        textures.push_back(wood);
+        
+        myPlane.createMesh(vertices, indices, textures, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
     }
 
     void render(double currentTime) {
@@ -148,36 +157,20 @@ public:
         lastFrame = currentFrame;
 
         myProgram.use();
-        glDepthFunc(GL_LESS);
+        glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
+        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(0.3f));
-        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
-        glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
-        myProgram.setMat4("view_matrix", view);
+
         myProgram.setMat4("projection_matrix", projection);
+        myProgram.setMat4("view_matrix", view);
         myProgram.setMat4("model_matrix", model);
 
-        myProgram.setVec3("lightPos", glm::vec3(2.0f, 2.0f, 2.0f));
+        myProgram.setVec3("lightPos", glm::vec3(0.0f, 0.3f, 0.0f));
         myProgram.setVec3("viewPos", glm::vec3(cameraPos));
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture.id);
-        myProgram.setInt("skybox", 2);
 
-        table.draw(myProgram);
-
-        myProgram1.use();
-        glDepthFunc(GL_LEQUAL);
-        glBindVertexArray(skyboxVAO);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture.id);
-        model = glm::mat4(1.0f);
-        view = glm::mat4(glm::mat3(glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp)));
-        projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
-        myProgram1.setMat4("projection_matrix", projection);
-        myProgram1.setMat4("view_matrix", view);
-        myProgram1.setMat4("model_matrix", model);
-        myProgram1.setVec3("viewPos", glm::vec3(cameraPos));
-
-        ourModel.draw(myProgram1);
+        myPlane.draw(myProgram);
 
         if (start == 0) {
             t1.display();
@@ -211,8 +204,7 @@ public:
 
     void shutdown() {
         myProgram.shutdown();
-        myProgram1.shutdown();
-        ourModel.shutdown();
+        myPlane.shutdown();
     }
 };
 
