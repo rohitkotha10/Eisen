@@ -161,13 +161,12 @@ public:
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(0.3f));
 
         myProgram.setMat4("projection_matrix", projection);
         myProgram.setMat4("view_matrix", view);
         myProgram.setMat4("model_matrix", model);
 
-        myProgram.setVec3("lightPos", glm::vec3(0.0f, 0.3f, 0.0f));
+        myProgram.setVec3("lightPos", glm::vec3(0.0f, 1.0f, 0.0f));
         myProgram.setVec3("viewPos", glm::vec3(cameraPos));
 
         myPlane.draw(myProgram);

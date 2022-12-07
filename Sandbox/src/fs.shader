@@ -38,7 +38,7 @@ void main() {
     vec3 halfwayDir = normalize(lightDir + viewDir);
 
     float diff = max(dot(norm, lightDir), 0.0f);
-    float spec = pow(max(dot(viewDir, halfwayDir), 0.0), 8.0f);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), 8.0f);
 
     ambient = 0.03f * diffuse;
     diffuse = diff * diffuse;
