@@ -22,10 +22,14 @@
   <ItemGroup>
     <None Include="res\shaders\vs.shader" />
     <None Include="res\shaders\fs.shader" />
-    <None Include="src\fs.shader" />
-    <None Include="src\vs.shader" />
+    <None Include="src\shaders\fs.shader" />
+    <None Include="src\shaders\vs.shader" />
     <None Include="README.md" />
-    <None Include="src\fsq.shader" />
-    <None Include="src\vsq.shader" />
+    <None Include="src\shaders\fsTest.shader" />
+    <None Include="src\shaders\vsTest.shader" />
+    <None Include="src\shaders\vsLight.shader" />
+    <None Include="src\shaders\fsLight.shader" />
+    <None Include="src\shaders\vsDepth.shader" />
+    <None Include="src\shaders\fsDepth.shader" />
   </ItemGroup>
 </Project>

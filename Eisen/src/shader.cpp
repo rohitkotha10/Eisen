@@ -30,7 +30,7 @@ namespace Eisen {
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(vs, 512, NULL, infoLog);
-            cout << "Vertex Shader Error\n" << infoLog << endl;
+            cout << "Vertex Shader Error: " << vsString << endl << infoLog << endl;
         }
 
         // frag shader
@@ -45,7 +45,7 @@ namespace Eisen {
         if (!success) {
             char infoLog[512];
             glGetShaderInfoLog(fs, 512, NULL, infoLog);
-            cout << "Frag Shader Error\n" << infoLog << endl;
+            cout << "Frag Shader Error: " << fsString << endl << infoLog << endl;
         }
 
         this->id = glCreateProgram();

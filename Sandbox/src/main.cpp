@@ -88,17 +88,18 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class my_app: public OpenGLApp {
     Program myProgram;
-    Program myProgramQuad;
+    Program myProgramDepth;
+    Program myProgramTest;
+    Program myProgramLight;
 
-    Framebuffer inverter;
+    Framebuffer depthfbo;
 
     Importer ourModel;
+    Importer cube;
     Mesh myPlane;
     Texture wood;
 
-    GLuint quadvao;
-    GLuint quadvbo;
-    GLuint quadebo;
+    glm::vec3 lightPos;
 
     int start = 0;
     Timer t1;
@@ -115,8 +116,10 @@ public:
     }
 
     void shaderCompile() {
-        myProgram.create("src/vs.shader", "src/fs.shader");
-        myProgramQuad.create("src/vsq.shader", "src/fsq.shader");
+        myProgram.create("src/shaders/vs.shader", "src/shaders/fs.shader");
+        myProgramDepth.create("src/shaders/vsDepth.shader", "src/shaders/fsDepth.shader");
+        myProgramTest.create("src/shaders/vsTest.shader", "src/shaders/fsTest.shader");
+        myProgramLight.create("src/shaders/vsLight.shader", "src/shaders/fsLight.shader");
     }
 
     void startup() {
@@ -130,63 +133,63 @@ public:
 
         wood.loadTexture("../media/wood.png", "diffuse");
         myPlane.createPlaneTexture(glm::vec3(0.0f, -0.5f, 0.0f), 20.0f, wood, 10.0f);
-        ourModel.loadModel("../media/backpack/backpack.obj");
+        ourModel.loadModel("../media/cube/cube.obj");
+        cube.loadModel("../media/cube/cube.obj");
 
-        inverter.create(screen_width, screen_height);
+        depthfbo.createDepthFBO(screen_width, screen_height);
 
-        Vertex a0;
-        a0.position = glm::vec3(-1.0f, -1.0f, 0.0f);
-        a0.texPos = glm::vec2(0.0f, 0.0f);
-
-        Vertex a1;
-        a1.position = glm::vec3(-1.0f, 1.0f, 0.0f);
-        a1.texPos = glm::vec2(0.0f, 1.0f);
-
-        Vertex a2;
-        a2.position = glm::vec3(1.0f, 1.0f, 0.0f);
-        a2.texPos = glm::vec2(1.0f, 1.0f);
-
-        Vertex a3;
-        a3.position = glm::vec3(1.0f, -1.0f, 0.0f);
-        a3.texPos = glm::vec2(1.0f, 0.0f);
-
-        vector<Vertex> vertices = {a0, a1, a2, a3};
-        vector<int> indices = {0, 1, 2, 2, 3, 0};
-
-        glGenVertexArrays(1, &quadvao);
-        glGenBuffers(1, &quadvbo);
-        glGenBuffers(1, &quadebo);
-
-        glBindVertexArray(quadvao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, quadvbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texPos));
-        glEnableVertexAttribArray(1);
+        lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
     }
 
     void render(double currentTime) {
-        glBindFramebuffer(GL_FRAMEBUFFER, inverter.id);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthfbo.id);
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         float currentFrame = (float)currentTime;
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        myProgram.use();
-        glm::mat4 projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
-        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+        myProgramDepth.use();
+        float near_plane = 1.0f, far_plane = 7.5f;
+        glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);  
+        glm::mat4 view = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), worldUp);
+        glm::mat4 lightSpace = projection * view;
 
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.3f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.3f, 0.0f));
+
+        myProgramDepth.setMat4("projection_matrix", projection);
+        myProgramDepth.setMat4("view_matrix", view);
+        myProgramDepth.setMat4("model_matrix", model);
+
+        ourModel.draw(myProgramDepth);
+
+        model = glm::mat4(1.0f);
+        myProgramDepth.setMat4("model_matrix", model);
+        myPlane.draw(myProgramDepth);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glEnable(GL_DEPTH_TEST);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        myProgram.use();
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthfbo.texture);
+        myProgram.setInt("depthMap", 2);
+
+        myProgram.setVec3("viewPos", cameraPos);
+        myProgram.setVec3("lightPos", lightPos);
+        myProgram.setMat4("lightSpace", lightSpace);
+
+        projection = glm::perspective(glm::radians(fov), screen_aspect, 0.1f, 100.0f);
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, worldUp);
+
+        model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(0.3f));
         model = glm::translate(model, glm::vec3(0.0f, 0.3f, 0.0f));
 
@@ -194,26 +197,13 @@ public:
         myProgram.setMat4("view_matrix", view);
         myProgram.setMat4("model_matrix", model);
 
-        myProgram.setVec3("lightPos", glm::vec3(1.0f, 1.0f, 1.0f));
-        myProgram.setVec3("viewPos", glm::vec3(cameraPos));
-
         ourModel.draw(myProgram);
 
         model = glm::mat4(1.0f);
         myProgram.setMat4("model_matrix", model);
         myPlane.draw(myProgram);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDisable(GL_DEPTH_TEST);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        myProgramQuad.use();
-        glBindVertexArray(quadvao);
-        glBindTexture(GL_TEXTURE_2D, inverter.texture);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        //depthfbo.drawfbo(myProgramTest);
 
         if (start == 0) {
             t1.display();
@@ -247,10 +237,13 @@ public:
 
     void shutdown() {
         myProgram.shutdown();
-        myProgramQuad.shutdown();
+        myProgramDepth.shutdown();
+        myProgramTest.shutdown();
+        myProgramLight.shutdown();
         myPlane.shutdown();
         ourModel.shutdown();
-        inverter.shutdown();
+        cube.shutdown();
+        depthfbo.shutdown();
     }
 };
 
