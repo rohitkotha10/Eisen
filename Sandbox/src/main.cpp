@@ -11,8 +11,8 @@ using namespace std;
 bool firstMouse = true;
 int press = 0;
 
-int screen_width = 1280;
-int screen_height = 720;
+int screen_width = 1920;
+int screen_height = 1080;
 float screen_aspect = (float)screen_width / (float)screen_height;
 float fov = 45.0f;
 
@@ -111,7 +111,7 @@ public:
         info.MajorVersion = 4;
         info.MinorVersion = 5;
         info.title = "Sandbox";
-        info.fullscreen = false;
+        info.fullscreen = true;
         info.resize = false;
     }
 
@@ -133,10 +133,10 @@ public:
 
         wood.loadTexture("../media/wood.png", "diffuse");
         myPlane.createPlaneTexture(glm::vec3(0.0f, -0.5f, 0.0f), 20.0f, wood, 10.0f);
-        ourModel.loadModel("../media/cube/cube.obj");
+        ourModel.loadModel("../media/backpack/backpack.obj");
         cube.loadModel("../media/cube/cube.obj");
 
-        depthfbo.createDepthFBO(screen_width, screen_height);
+        depthfbo.create(screen_width, screen_height);
 
         lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
     }
@@ -153,7 +153,7 @@ public:
 
         myProgramDepth.use();
         float near_plane = 1.0f, far_plane = 7.5f;
-        glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);  
+        glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 view = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), worldUp);
         glm::mat4 lightSpace = projection * view;
 
@@ -203,7 +203,18 @@ public:
         myProgram.setMat4("model_matrix", model);
         myPlane.draw(myProgram);
 
-        //depthfbo.drawfbo(myProgramTest);
+        // depthfbo.drawfbo(myProgramTest);
+
+        myProgramLight.use();
+
+        model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(0.1f));
+        model = glm::translate(model, 10.0f * lightPos);
+        myProgramLight.setMat4("projection_matrix", projection);
+        myProgramLight.setMat4("view_matrix", view);
+        myProgramLight.setMat4("model_matrix", model);
+
+        cube.draw(myProgramLight);
 
         if (start == 0) {
             t1.display();

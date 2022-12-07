@@ -50,8 +50,9 @@ void main() {
     diffuse = diff * diffuse;
     specular = spec * specular;
 
-    //dont do this division in vertex shader!!!
+    // dont do this division in vertex shader!!!
     vec3 temp = fragInLight.xyz / fragInLight.w;
+
     float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
     temp = temp * 0.5f + 0.5f;
     float depVal = texture(depthMap, temp.xy).r;
@@ -60,6 +61,8 @@ void main() {
         shadow = 1.0f;
     else
         shadow = 0.0f;
+
+    if (temp.z >= 1.0 - bias) shadow = 0.0f;
 
     vec3 result = (ambient + (1.0 - shadow) * (diffuse + specular));
     FragColor = vec4(result, 1.0);
