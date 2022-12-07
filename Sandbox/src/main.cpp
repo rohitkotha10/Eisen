@@ -88,10 +88,17 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 
 class my_app: public OpenGLApp {
     Program myProgram;
+    Program myProgramQuad;
+
+    Framebuffer inverter;
 
     Importer ourModel;
     Mesh myPlane;
     Texture wood;
+
+    GLuint quadvao;
+    GLuint quadvbo;
+    GLuint quadebo;
 
     int start = 0;
     Timer t1;
@@ -107,7 +114,10 @@ public:
         info.resize = false;
     }
 
-    void shaderCompile() { myProgram.create("src/vs.shader", "src/fs.shader"); }
+    void shaderCompile() {
+        myProgram.create("src/vs.shader", "src/fs.shader");
+        myProgramQuad.create("src/vsq.shader", "src/fsq.shader");
+    }
 
     void startup() {
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -119,12 +129,51 @@ public:
         t1.start("First Frame");
 
         wood.loadTexture("../media/wood.png", "diffuse");
-
         myPlane.createPlaneTexture(glm::vec3(0.0f, -0.5f, 0.0f), 20.0f, wood, 10.0f);
         ourModel.loadModel("../media/backpack/backpack.obj");
+
+        inverter.create(screen_width, screen_height);
+
+        Vertex a0;
+        a0.position = glm::vec3(-1.0f, -1.0f, 0.0f);
+        a0.texPos = glm::vec2(0.0f, 0.0f);
+
+        Vertex a1;
+        a1.position = glm::vec3(-1.0f, 1.0f, 0.0f);
+        a1.texPos = glm::vec2(0.0f, 1.0f);
+
+        Vertex a2;
+        a2.position = glm::vec3(1.0f, 1.0f, 0.0f);
+        a2.texPos = glm::vec2(1.0f, 1.0f);
+
+        Vertex a3;
+        a3.position = glm::vec3(1.0f, -1.0f, 0.0f);
+        a3.texPos = glm::vec2(1.0f, 0.0f);
+
+        vector<Vertex> vertices = {a0, a1, a2, a3};
+        vector<int> indices = {0, 1, 2, 2, 3, 0};
+
+        glGenVertexArrays(1, &quadvao);
+        glGenBuffers(1, &quadvbo);
+        glGenBuffers(1, &quadebo);
+
+        glBindVertexArray(quadvao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, quadvbo);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texPos));
+        glEnableVertexAttribArray(1);
     }
 
     void render(double currentTime) {
+        glBindFramebuffer(GL_FRAMEBUFFER, inverter.id);
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -153,6 +202,18 @@ public:
         model = glm::mat4(1.0f);
         myProgram.setMat4("model_matrix", model);
         myPlane.draw(myProgram);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glDisable(GL_DEPTH_TEST);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        myProgramQuad.use();
+        glBindVertexArray(quadvao);
+        glBindTexture(GL_TEXTURE_2D, inverter.texture);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         if (start == 0) {
             t1.display();
@@ -186,8 +247,10 @@ public:
 
     void shutdown() {
         myProgram.shutdown();
+        myProgramQuad.shutdown();
         myPlane.shutdown();
         ourModel.shutdown();
+        inverter.shutdown();
     }
 };
 

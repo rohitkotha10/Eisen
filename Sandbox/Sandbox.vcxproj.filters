@@ -25,5 +25,7 @@
     <None Include="src\fs.shader" />
     <None Include="src\vs.shader" />
     <None Include="README.md" />
+    <None Include="src\fsq.shader" />
+    <None Include="src\vsq.shader" />
   </ItemGroup>
 </Project>

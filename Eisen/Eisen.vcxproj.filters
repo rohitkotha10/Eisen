@@ -39,6 +39,9 @@
     <ClInclude Include="src\importer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\framebuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\application.cpp">
@@ -66,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\importer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\framebufffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
