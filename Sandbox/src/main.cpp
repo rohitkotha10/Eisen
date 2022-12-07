@@ -118,34 +118,9 @@ public:
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         t1.start("First Frame");
 
-        Vertex a0;
-        a0.position = glm::vec3(10.0f, -0.5f, 10.0f);
-        a0.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-        a0.texPos = glm::vec2(10.0f, 0.0f);
-
-        Vertex a1;
-        a1.position = glm::vec3(-10.0f, -0.5f, 10.0f);
-        a1.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-        a1.texPos = glm::vec2(0.0f, 0.0f);
-
-        Vertex a2;
-        a2.position = glm::vec3(-10.0f, -0.5f, -10.0f);
-        a2.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-        a2.texPos = glm::vec2(0.0f, 10.0f);
-
-        Vertex a3;
-        a3.position = glm::vec3(10.0f, -0.5f, -10.0f);
-        a3.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-        a3.texPos = glm::vec2(10.0f, 10.0f);
-
-        vector<Vertex> vertices = {a0, a1, a2, a3};
-        vector<GLuint> indices = {0, 1, 2, 0, 2, 3};
-
         wood.loadTexture("../media/wood.png", "diffuse");
-        vector<Texture> textures;
-        textures.push_back(wood);
-        
-        myPlane.createMesh(vertices, indices, textures, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+        myPlane.createPlaneTexture(glm::vec3(0.0f, -0.5f, 0.0f), 20.0f, wood, 10.0f);
         ourModel.loadModel("../media/backpack/backpack.obj");
     }
 
