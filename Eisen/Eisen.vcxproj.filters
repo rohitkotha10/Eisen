@@ -71,7 +71,7 @@
     <ClCompile Include="src\importer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\framebufffer.cpp">
+    <ClCompile Include="src\framebuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
