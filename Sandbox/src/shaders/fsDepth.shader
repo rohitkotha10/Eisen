@@ -5,7 +5,7 @@ out vec4 FragColor;
 in vec4 fragPos;
 
 void main() {
-    float dep = fragPos.z / fragPos.w;
+    float dep = fragPos.z;
     // change from [-1, 1] to [0,1]
     dep = dep * 0.5 + 0.5;
 

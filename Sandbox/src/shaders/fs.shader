@@ -50,7 +50,7 @@ void main() {
     diffuse = diff * diffuse;
     specular = spec * specular;
 
-    vec3 temp = fragInLight.xyz / fragInLight.w;
+    vec3 temp = fragInLight.xyz;
 
     float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
     temp = temp * 0.5f + 0.5f;
