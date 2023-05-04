@@ -39,7 +39,7 @@ namespace Eisen {
             glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         } else {
-            std::cout << "Failed to load texture: " << path << std::endl;
+            cout << "Failed to load texture: " << path << endl;
         }
         stbi_image_free(data);
 
@@ -72,7 +72,7 @@ namespace Eisen {
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
                 stbi_image_free(data);
             } else {
-                std::cout << "Cubemap texture failed: " << faces[i] << std::endl;
+                cout << "Cubemap texture failed: " << faces[i] << endl;
                 stbi_image_free(data);
             }
         }

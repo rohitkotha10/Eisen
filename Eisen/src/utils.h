@@ -1,7 +1,8 @@
 #pragma once
-#include <chrono>
+
 #include <iostream>
 #include <string>
+#include <chrono>
 
 namespace Eisen {
     class Timer {

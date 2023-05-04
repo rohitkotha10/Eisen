@@ -1,5 +1,17 @@
 #pragma once
+
 #include "primitives.h"
+#include "shader.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <iostream>
+#include <vector>
 
 namespace Eisen {
     class Framebuffer {
@@ -7,7 +19,7 @@ namespace Eisen {
         void create(int scrw, int scrh);
         void createDepthFBO(int scrw, int scrh);
         void shutdown();
-        void drawfbo(Program& program); //draw the texture on a quad
+        void drawfbo(Program& program);  // draw the texture on a quad
 
         GLuint id;
         GLuint texture;

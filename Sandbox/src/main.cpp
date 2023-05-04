@@ -1,8 +1,3 @@
-#include <windows.h>
-extern "C" {
-_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-}  // force GPU use
-
 #include "Eisen.h"
 
 using namespace Eisen;
@@ -144,6 +139,7 @@ public:
     void render(double currentTime) {
         glBindFramebuffer(GL_FRAMEBUFFER, depthfbo.id);
         glEnable(GL_DEPTH_TEST);
+
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -173,6 +169,7 @@ public:
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glEnable(GL_DEPTH_TEST);
+
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -6,10 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <string>
-#include <vector>
-#include <fstream>
 #include <iostream>
+#include <fstream>
+#include <string>
 
 namespace Eisen {
     std::string parse(std::string shaderPath);

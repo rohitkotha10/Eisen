@@ -136,8 +136,8 @@
     <None Include="README.md" />
     <None Include="res\shaders\fs.shader" />
     <None Include="res\shaders\vs.shader" />
-    <None Include="src\fs.shader" />
-    <None Include="src\vs.shader" />
+    <None Include="src\shaders\fs.shader" />
+    <None Include="src\shaders\vs.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\chess.cpp" />

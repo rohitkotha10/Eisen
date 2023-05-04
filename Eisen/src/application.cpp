@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "application.h"
 
 using namespace std;
 
@@ -39,7 +39,6 @@ namespace Eisen {
         startup();
 
         while (!glfwWindowShouldClose(window)) {
-
             render(glfwGetTime());
 
             glfwPollEvents();

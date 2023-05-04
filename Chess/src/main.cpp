@@ -1,8 +1,3 @@
-#include <windows.h>
-extern "C" {
-_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-}  // force GPU use
-
 #include "Eisen.h"
 #include "chess.h"
 
@@ -71,7 +66,7 @@ public:
         info.resize = false;
     }
 
-    void shaderCompile() { program.create("src/vs.shader", "src/fs.shader"); }
+    void shaderCompile() { program.create("src/shaders/vs.shader", "src/shaders/fs.shader"); }
 
     void startup() {
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -104,7 +99,7 @@ public:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         program.use();
 
